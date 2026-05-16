@@ -1,28 +1,28 @@
-# Conductor Orchestration
+# Orquestração Conductor
 
-This directory contains the structural and procedural logic for the project's development, orchestrated by the **Gemini CLI Conductor extension**.
+Este diretório contém a lógica estrutural e procedural para o desenvolvimento do projeto, orquestrada pela **extensão Conductor do Gemini CLI**.
 
-## 🧠 What is Conductor?
+## 🧠 O que é o Conductor?
 
-Conductor is a framework for managing complex software development tasks using AI agents. It organizes the project into:
+O Conductor é um framework para gerenciar tarefas complexas de desenvolvimento de software usando agentes de IA. Ele organiza o projeto em:
 
--   **Product Vision:** Defining the "What" and "Why" (`product.md`).
--   **Tech Stack:** Selecting the tools (`tech-stack.md`).
--   **Tracks:** Sequential or parallel milestones for implementation (`tracks/`).
--   **Guidelines:** Enforcing consistent code style and product standards (`product-guidelines.md`, `code_styleguides/`).
+-   **Visão do Produto:** Definindo o "O quê" e o "Porquê" (`product.md`).
+-   **Tech Stack:** Selecionando as ferramentas (`tech-stack.md`).
+-   **Tracks (Trilhas):** Marcos sequenciais ou paralelos para implementação (`tracks/`).
+-   **Diretrizes:** Aplicando padrões consistentes de código e de produto (`product-guidelines.md`, `code_styleguides/`).
 
-## 🤖 Developed with Gemini CLI
+## 🤖 Desenvolvido com Gemini CLI
 
-This project was developed through the **Conductor** extension of [Gemini CLI](https://github.com/google/gemini-cli). 
+Este projeto foi desenvolvido através da extensão **Conductor** do [Gemini CLI](https://github.com/google/gemini-cli).
 
-The agents use the files in this directory as their "source of truth" for:
-1.  **Architecture:** Following the defined tech stack.
-2.  **State:** Tracking progress through "Tracks".
-3.  **Context:** Understanding the product requirements without manual explanation.
+Os agentes usam os arquivos neste diretório como sua "fonte da verdade" para:
+1.  **Arquitetura:** Seguindo a stack tecnológica definida.
+2.  **Estado:** Acompanhando o progresso através das "Tracks".
+3.  **Contexto:** Entendendo os requisitos do produto sem a necessidade de explicações manuais.
 
-## 📁 Directory Structure
+## 📁 Estrutura do Diretório
 
--   `product.md`: High-level vision and features.
--   `tech-stack.md`: Documentation of the chosen technologies.
--   `tracks/`: Contains specific implementation plans and metadata for each milestone.
--   `code_styleguides/`: Technical standards for TypeScript, CSS, and general coding.
+-   `product.md`: Visão de alto nível e funcionalidades.
+-   `tech-stack.md`: Documentação das tecnologias escolhidas.
+-   `tracks/`: Contém planos de implementação específicos e metadados para cada marco.
+-   `code_styleguides/`: Padrões técnicos para TypeScript, CSS e codificação geral.

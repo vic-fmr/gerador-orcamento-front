@@ -1,16 +1,16 @@
-# Project Context
+# Contexto do Projeto
 
-- [About Conductor](./README.md)
+- [Sobre o Conductor](./README.md)
 
-## Definition
-- [Product Definition](./product.md)
-- [Product Guidelines](./product-guidelines.md)
+## Definição
+- [Definição do Produto](./product.md)
+- [Diretrizes do Produto](./product-guidelines.md)
 - [Tech Stack](./tech-stack.md)
 
-## Workflow
+## Fluxo de Trabalho
 - [Workflow](./workflow.md)
-- [Code Style Guides](./code_styleguides/)
+- [Guias de Estilo de Código](./code_styleguides/)
 
-## Management
-- [Tracks Registry](./tracks.md)
-- [Tracks Directory](./tracks/)
+## Gerenciamento
+- [Registro de Tracks](./tracks.md)
+- [Diretório de Tracks](./tracks/)
