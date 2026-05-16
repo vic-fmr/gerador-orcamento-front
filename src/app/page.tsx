@@ -27,24 +27,24 @@ export default function Home() {
 
   const stats = [
     { 
-      name: 'Pending', 
-      value: new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(statsData.pending.value), 
+      name: 'Pendentes', 
+      value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(statsData.pending.value), 
       count: statsData.pending.count, 
       icon: Clock, 
       color: 'text-yellow-500', 
       bg: 'bg-yellow-500/10' 
     },
     { 
-      name: 'Approved', 
-      value: new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(statsData.approved.value), 
+      name: 'Aprovados', 
+      value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(statsData.approved.value), 
       count: statsData.approved.count, 
       icon: CheckCircle2, 
       color: 'text-green-500', 
       bg: 'bg-green-500/10' 
     },
     { 
-      name: 'Paid', 
-      value: new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(statsData.paid.value), 
+      name: 'Pagos', 
+      value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(statsData.paid.value), 
       count: statsData.paid.count, 
       icon: CreditCard, 
       color: 'text-blue-500', 
@@ -57,17 +57,18 @@ export default function Home() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Dashboard Overview</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Visão Geral</h2>
           <p className="text-muted-foreground mt-1">
-            Welcome back! Here's what's happening with your estimates.
+            Bem-vindo de volta! Veja o que está acontecendo com seus orçamentos.
           </p>
         </div>
-        <Button asChild className="bg-primary hover:bg-primary/90">
-          <Link href="/estimates/new" className="flex items-center">
-            <Plus className="mr-2 h-4 w-4" />
-            New Estimate
-          </Link>
-        </Button>
+        <Link 
+          href="/estimates/new" 
+          className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Novo Orçamento
+        </Link>
       </div>
 
       {/* Stats Cards */}
@@ -83,7 +84,7 @@ export default function Home() {
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                {stat.count} estimates total
+                {stat.count} orçamentos no total
               </p>
             </CardContent>
           </Card>
@@ -94,9 +95,9 @@ export default function Home() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4 shadow-sm border-none bg-secondary/5">
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle>Atividade Recente</CardTitle>
             <CardDescription>
-              Your latest estimates and their current status.
+              Seus últimos orçamentos e seus status atuais.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -109,12 +110,12 @@ export default function Home() {
                       </div>
                       <div>
                         <p className="font-medium text-sm">{estimate.title}</p>
-                        <p className="text-xs text-muted-foreground">Client: {estimate.client}</p>
+                        <p className="text-xs text-muted-foreground">Cliente: {estimate.client}</p>
                       </div>
                     </div>
                     <div className="text-right">
                        <p className="text-sm font-semibold">
-                         {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(estimate.amount)}
+                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(estimate.amount)}
                        </p>
                        <p className={cn(
                          "text-[10px] font-medium px-1.5 py-0.5 rounded-full inline-block capitalize",
@@ -122,14 +123,14 @@ export default function Home() {
                          estimate.status === 'approved' && "text-green-600 bg-green-100",
                          estimate.status === 'paid' && "text-blue-600 bg-blue-100"
                        )}>
-                         {estimate.status}
+                         {estimate.status === 'pending' ? 'pendente' : estimate.status === 'approved' ? 'aprovado' : 'pago'}
                        </p>
                     </div>
                   </div>
                 ))}
                 {estimates.length === 0 && (
                   <div className="text-center py-8 text-muted-foreground">
-                    No estimates found. Create your first one!
+                    Nenhum orçamento encontrado. Crie o seu primeiro!
                   </div>
                 )}
              </div>
@@ -139,17 +140,17 @@ export default function Home() {
         <Card className="col-span-3 shadow-sm border-none bg-primary text-primary-foreground">
            <CardHeader>
              <CardTitle className="flex items-center justify-between">
-               Revenue Growth
+               Crescimento de Receita
                <TrendingUp className="h-5 w-5" />
              </CardTitle>
            </CardHeader>
            <CardContent>
               <div className="text-4xl font-bold mb-2">+12.5%</div>
               <p className="text-primary-foreground/80 text-sm mb-6">
-                Your revenue has increased by 12.5% compared to last month.
+                Sua receita aumentou 12.5% em relação ao mês passado.
               </p>
               <Button variant="secondary" className="w-full font-semibold group">
-                View Reports
+                Ver Relatórios
                 <ArrowUpRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </Button>
            </CardContent>
@@ -158,7 +159,6 @@ export default function Home() {
     </div>
   )
 }
-
 function cn(...inputs: any[]) {
   return inputs.filter(Boolean).join(' ')
 }

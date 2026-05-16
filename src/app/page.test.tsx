@@ -10,8 +10,8 @@ vi.mock('@/components/layout/Shell', () => ({
 test('Dashboard Home renders summary cards and new estimate button', () => {
   render(<Home />)
   
-  expect(screen.getAllByText('Pending').length).toBeGreaterThan(0)
-  expect(screen.getByText('Approved')).toBeInTheDocument()
-  expect(screen.getByText('Paid')).toBeInTheDocument()
-  expect(screen.getByText(/new estimate/i)).toBeInTheDocument()
+  expect(screen.getAllByText('Pendentes').length).toBeGreaterThan(0)
+  expect(screen.getByText('Aprovados')).toBeInTheDocument()
+  expect(screen.getByText('Pagos')).toBeInTheDocument()
+  expect(screen.getByText(/novo orçamento/i)).toBeInTheDocument()
 })

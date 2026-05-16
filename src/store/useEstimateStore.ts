@@ -27,7 +27,7 @@ export const useEstimateStore = create<EstimateState>((set, get) => ({
   estimates: [
     {
       id: '1',
-      title: 'Kitchen Renovation',
+      title: 'Reforma de Cozinha',
       client: 'Global Tech Inc.',
       amount: 5200,
       status: 'pending',
@@ -35,7 +35,7 @@ export const useEstimateStore = create<EstimateState>((set, get) => ({
     },
     {
       id: '2',
-      title: 'Bathroom Tiling',
+      title: 'Revestimento de Banheiro',
       client: 'Home Services Ltd',
       amount: 2400,
       status: 'approved',
@@ -43,7 +43,7 @@ export const useEstimateStore = create<EstimateState>((set, get) => ({
     },
     {
       id: '3',
-      title: 'Electrical Rewiring',
+      title: 'Reinstalação Elétrica',
       client: 'City Apartments',
       amount: 7800,
       status: 'paid',

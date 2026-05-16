@@ -16,10 +16,10 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
 const navItems = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Estimates', href: '/estimates', icon: FileText },
-  { name: 'Clients', href: '/clients', icon: Users },
-  { name: 'Settings', href: '/settings', icon: Settings },
+  { name: 'Painel', href: '/', icon: LayoutDashboard },
+  { name: 'Orçamentos', href: '/estimates', icon: FileText },
+  { name: 'Clientes', href: '/clients', icon: Users },
+  { name: 'Configurações', href: '/settings', icon: Settings },
 ]
 
 export function Shell({ children }: { children: React.ReactNode }) {
@@ -35,7 +35,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           isSidebarOpen ? "w-64" : "w-20"
         )}
         role="navigation"
-        aria-label="Sidebar"
+        aria-label="Barra Lateral"
       >
         <div className="flex flex-col h-full">
           {/* Logo / Brand */}
@@ -85,8 +85,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
                   "ml-3 overflow-hidden transition-opacity duration-300",
                   isSidebarOpen ? "opacity-100" : "opacity-0 w-0"
                 )}>
-                  <p className="text-sm font-medium leading-none">John Doe</p>
-                  <p className="text-xs text-sidebar-foreground/60 mt-1">Professional</p>
+                  <p className="text-sm font-medium leading-none">João Silva</p>
+                  <p className="text-xs text-sidebar-foreground/60 mt-1">Profissional</p>
                 </div>
              </div>
           </div>
@@ -107,7 +107,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               <Menu className="w-5 h-5" />
             </Button>
             <h1 className="text-xl font-semibold text-foreground">
-              {navItems.find(item => item.href === pathname)?.name || 'App'}
+              {navItems.find(item => item.href === pathname)?.name || 'Aplicativo'}
             </h1>
           </div>
           

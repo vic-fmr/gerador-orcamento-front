@@ -15,7 +15,7 @@ test('Shell renders sidebar and navbar', () => {
   )
   
   // Check for Sidebar
-  expect(screen.getByRole('navigation', { name: 'Sidebar' })).toBeInTheDocument()
+  expect(screen.getByRole('navigation', { name: 'Barra Lateral' })).toBeInTheDocument()
   // Check for Header/Navbar
   expect(screen.getByRole('banner')).toBeInTheDocument()
   // Check for Main Content
