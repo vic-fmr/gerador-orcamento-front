@@ -1,9 +1,17 @@
 import { render, screen } from '@testing-library/react'
 import Home from '@/app/page'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 
-test('Home page renders successfully', () => {
+// Mock Shell to avoid testing it here
+vi.mock('@/components/layout/Shell', () => ({
+  Shell: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}))
+
+test('Dashboard Home renders summary cards and new estimate button', () => {
   render(<Home />)
-  // Just a basic check to see if it renders something from the default Next.js template
-  // If it's a fresh Next.js app, it might have "Get started" or similar
+  
+  expect(screen.getAllByText('Pending').length).toBeGreaterThan(0)
+  expect(screen.getByText('Approved')).toBeInTheDocument()
+  expect(screen.getByText('Paid')).toBeInTheDocument()
+  expect(screen.getByText(/new estimate/i)).toBeInTheDocument()
 })
