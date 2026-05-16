@@ -1,3 +1,6 @@
+'use client'
+
+import React from 'react'
 import Link from 'next/link'
 import { 
   Plus, 
@@ -5,7 +8,8 @@ import {
   CheckCircle2, 
   CreditCard,
   ArrowUpRight,
-  TrendingUp
+  TrendingUp,
+  FileText as LucideFileText
 } from 'lucide-react'
 import { 
   Card, 
@@ -15,35 +19,39 @@ import {
   CardDescription 
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-
-const stats = [
-  { 
-    name: 'Pending', 
-    value: '$12,450', 
-    count: 5, 
-    icon: Clock, 
-    color: 'text-yellow-500', 
-    bg: 'bg-yellow-500/10' 
-  },
-  { 
-    name: 'Approved', 
-    value: '$45,200', 
-    count: 12, 
-    icon: CheckCircle2, 
-    color: 'text-green-500', 
-    bg: 'bg-green-500/10' 
-  },
-  { 
-    name: 'Paid', 
-    value: '$32,100', 
-    count: 8, 
-    icon: CreditCard, 
-    color: 'text-blue-500', 
-    bg: 'bg-blue-500/10' 
-  },
-]
+import { useEstimateStore } from '@/store/useEstimateStore'
 
 export default function Home() {
+  const { estimates, getStats } = useEstimateStore()
+  const statsData = getStats()
+
+  const stats = [
+    { 
+      name: 'Pending', 
+      value: new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(statsData.pending.value), 
+      count: statsData.pending.count, 
+      icon: Clock, 
+      color: 'text-yellow-500', 
+      bg: 'bg-yellow-500/10' 
+    },
+    { 
+      name: 'Approved', 
+      value: new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(statsData.approved.value), 
+      count: statsData.approved.count, 
+      icon: CheckCircle2, 
+      color: 'text-green-500', 
+      bg: 'bg-green-500/10' 
+    },
+    { 
+      name: 'Paid', 
+      value: new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(statsData.paid.value), 
+      count: statsData.paid.count, 
+      icon: CreditCard, 
+      color: 'text-blue-500', 
+      bg: 'bg-blue-500/10' 
+    },
+  ]
+
   return (
     <div className="space-y-8">
       {/* Header Section */}
@@ -93,23 +101,37 @@ export default function Home() {
           </CardHeader>
           <CardContent>
              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center justify-between p-3 bg-card rounded-lg border border-border/50">
+                {estimates.slice(0, 5).map((estimate) => (
+                  <div key={estimate.id} className="flex items-center justify-between p-3 bg-card rounded-lg border border-border/50">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded bg-primary/10 flex items-center justify-center">
-                        <FileText className="w-5 h-5 text-primary" />
+                        <LucideFileText className="w-5 h-5 text-primary" />
                       </div>
                       <div>
-                        <p className="font-medium text-sm">Estimate #100{i} - Kitchen Renovation</p>
-                        <p className="text-xs text-muted-foreground">Client: Global Tech Inc.</p>
+                        <p className="font-medium text-sm">{estimate.title}</p>
+                        <p className="text-xs text-muted-foreground">Client: {estimate.client}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                       <p className="text-sm font-semibold">$5,200.00</p>
-                       <p className="text-[10px] text-yellow-600 font-medium bg-yellow-100 px-1.5 py-0.5 rounded-full inline-block">Pending</p>
+                       <p className="text-sm font-semibold">
+                         {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(estimate.amount)}
+                       </p>
+                       <p className={cn(
+                         "text-[10px] font-medium px-1.5 py-0.5 rounded-full inline-block capitalize",
+                         estimate.status === 'pending' && "text-yellow-600 bg-yellow-100",
+                         estimate.status === 'approved' && "text-green-600 bg-green-100",
+                         estimate.status === 'paid' && "text-blue-600 bg-blue-100"
+                       )}>
+                         {estimate.status}
+                       </p>
                     </div>
                   </div>
                 ))}
+                {estimates.length === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No estimates found. Create your first one!
+                  </div>
+                )}
              </div>
           </CardContent>
         </Card>
@@ -137,25 +159,7 @@ export default function Home() {
   )
 }
 
-function FileText(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-      <polyline points="14 2 14 8 20 8" />
-      <line x1="16" y1="13" x2="8" y2="13" />
-      <line x1="16" y1="17" x2="8" y2="17" />
-      <line x1="10" y1="9" x2="8" y2="9" />
-    </svg>
-  )
+function cn(...inputs: any[]) {
+  return inputs.filter(Boolean).join(' ')
 }
+

@@ -4,7 +4,7 @@
 - [x] Task: Initialize Next.js project with TypeScript, Tailwind, and Shadcn UI (7ff06e8)
 - [x] Task: Set up core layouts (sidebar/navbar) with a "Modern & Vibrant" feel (Slate & Safety Orange) (c6d5475)
 - [x] Task: Implement Dashboard Home with summary cards (Pending, Approved, Paid) (2fa3ebe)
-- [ ] Task: Create a mock API/Store using Zustand to hold initial estimate data
+- [~] Task: Create a mock API/Store using Zustand to hold initial estimate data
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Project Scaffolding & Dashboard Shell' (Protocol in workflow.md)
 
 ## Phase 2: Estimate Creation Workflow
