@@ -8,7 +8,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Project Scaffolding & Dashboard Shell' (Protocol in workflow.md) (be8ec07)
 
 ## Phase 2: Estimate Creation Workflow
-- [ ] Task: Implement "New Estimate" page with React Hook Form and Zod validation
+- [~] Task: Implement "New Estimate" page with React Hook Form and Zod validation
 - [ ] Task: Create Line Item component with real-time price calculations
 - [ ] Task: Implement Step-by-step wizard flow for estimate creation
 - [ ] Task: Integrate TanStack Query for saving/loading estimates to the state/mock-backend
