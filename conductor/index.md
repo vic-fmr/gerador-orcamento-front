@@ -1,5 +1,7 @@
 # Project Context
 
+- [About Conductor](./README.md)
+
 ## Definition
 - [Product Definition](./product.md)
 - [Product Guidelines](./product-guidelines.md)
