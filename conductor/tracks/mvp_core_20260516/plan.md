@@ -1,7 +1,7 @@
 # Implementation Plan - Implement core estimate creation and dashboard status overview MVP
 
 ## Phase 1: Project Scaffolding & Dashboard Shell
-- [~] Task: Initialize Next.js project with TypeScript, Tailwind, and Shadcn UI
+- [x] Task: Initialize Next.js project with TypeScript, Tailwind, and Shadcn UI (7ff06e8)
 - [ ] Task: Set up core layouts (sidebar/navbar) with a "Modern & Vibrant" feel (Slate & Safety Orange)
 - [ ] Task: Implement Dashboard Home with summary cards (Pending, Approved, Paid)
 - [ ] Task: Create a mock API/Store using Zustand to hold initial estimate data
