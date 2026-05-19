@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Implement core estimate creation and dashboard status overview MVP**
+- [x] **Track: Implement core estimate creation and dashboard status overview MVP**
   *Link: [./tracks/mvp_core_20260516/](./tracks/mvp_core_20260516/)*
