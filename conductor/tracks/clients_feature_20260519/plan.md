@@ -22,9 +22,9 @@
 - [x] Task: Create Clients Table Component aeda494
     - [ ] Write failing test for `ClientsTable` to verify it renders correct columns and mock data rows.
     - [ ] Implement `ClientsTable.tsx` using Shadcn UI `Table`.
-- [~] Task: Implement Main Clients Route
-    - [ ] Write failing test for `/clients` page.
-    - [ ] Create `src/app/clients/page.tsx` integrating the Table and the Sheet trigger.
-- [~] Task: Add Navigation Link
-    - [ ] Update `src/components/layout/Shell.tsx` to include a navigation link to `/clients`.
+- [x] Task: Implement Main Clients Route 5af8c0d
+    - [x] Write failing test for `/clients` page.
+    - [x] Create `src/app/clients/page.tsx` integrating the Table and the Sheet trigger.
+- [x] Task: Add Navigation Link 5af8c0d
+    - [x] Update `src/components/layout/Shell.tsx` to include a navigation link to `/clients`.
 - [ ] Task: Conductor - User Manual Verification 'Clients List Page' (Protocol in workflow.md)
