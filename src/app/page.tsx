@@ -93,7 +93,7 @@ export default function Home() {
 
       {/* Main Grid for recent activity or charts */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4 shadow-sm border-none bg-secondary/5">
+        <Card className="col-span-7 shadow-sm border-none bg-secondary/5">
           <CardHeader>
             <CardTitle>Atividade Recente</CardTitle>
             <CardDescription>
@@ -137,6 +137,8 @@ export default function Home() {
           </CardContent>
         </Card>
 
+        {/* 
+        Implementação futura. Pode ser um gráfico de crescimento de receita ou algo similar.
         <Card className="col-span-3 shadow-sm border-none bg-primary text-primary-foreground">
            <CardHeader>
              <CardTitle className="flex items-center justify-between">
@@ -154,7 +156,7 @@ export default function Home() {
                 <ArrowUpRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </Button>
            </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   )
