@@ -9,7 +9,7 @@
 
 ## Phase 2: Estimate Creation Workflow
 - [x] Task: Implement "New Estimate" page with React Hook Form and Zod validation (2a1605f)
-- [ ] Task: Create Line Item component with real-time price calculations
+- [x] Task: Create Line Item component with real-time price calculations (902c41b)
 - [ ] Task: Implement Step-by-step wizard flow for estimate creation
 - [ ] Task: Integrate TanStack Query for saving/loading estimates to the state/mock-backend
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Estimate Creation Workflow' (Protocol in workflow.md)
