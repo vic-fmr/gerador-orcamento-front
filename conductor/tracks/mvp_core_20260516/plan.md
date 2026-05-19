@@ -18,7 +18,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Estimate Creation Workflow' (Protocol in workflow.md) (d07cf23)
 
 ## Phase 3: Document Export & History
-- [ ] Task: Implement Estimate History list with search and filtering
+- [x] Task: Implement Estimate History list with search and filtering (fa593f6)
 - [ ] Task: Integrate jspdf for basic branded PDF export
 - [ ] Task: Implement Document Preview before download
 - [ ] Task: Final responsive polish for mobile field work
