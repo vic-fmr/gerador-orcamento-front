@@ -20,9 +20,12 @@ export function EstimatePreview({ estimate, onClose }: EstimatePreviewProps) {
     return () => window.removeEventListener('keydown', handleEsc)
   }, [onClose])
 
+  const PRIMARY_COLOR_CLASS = "bg-[#006699]"
+  const PRIMARY_TEXT_CLASS = "text-[#006699]"
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="bg-background w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col">
+      <div className="bg-background w-full max-w-4xl max-h-[95vh] overflow-y-auto rounded-xl shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col">
         <div className="sticky top-0 bg-background border-b border-border p-4 flex items-center justify-between z-10 shrink-0">
           <h3 className="text-xl font-bold">Visualização do Orçamento</h3>
           <div className="flex items-center gap-2">
@@ -40,52 +43,49 @@ export function EstimatePreview({ estimate, onClose }: EstimatePreviewProps) {
           </div>
         </div>
 
-        <div className="p-8 space-y-8 bg-white text-slate-900 flex-1">
-          {/* Branded Header */}
-          <div className="flex justify-between items-start border-b-2 border-primary/20 pb-6">
-            <div>
-              <h2 className="text-3xl font-extrabold text-primary">EstimatePro</h2>
-              <p className="text-sm text-slate-500 font-medium">Orçamentos Profissionais</p>
+        <div className="p-12 space-y-8 bg-white text-slate-900 flex-1 min-h-[800px]">
+          {/* Header Bar */}
+          <div className="flex justify-between items-stretch">
+            <div className={`${PRIMARY_COLOR_CLASS} text-white px-12 py-4 flex items-center justify-center min-w-[300px]`}>
+              <h2 className="text-3xl font-black tracking-tighter">ORÇAMENTO</h2>
             </div>
-            <div className="text-right">
-              <p className="font-bold text-lg">ORÇAMENTO</p>
-              <p className="text-sm text-slate-500">#{estimate.id.toUpperCase()}</p>
-            </div>
-          </div>
-
-          {/* Details */}
-          <div className="grid grid-cols-2 gap-8 text-sm">
-            <div className="space-y-1">
-              <p className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Cliente</p>
-              <p className="font-bold text-lg">{estimate.client}</p>
-            </div>
-            <div className="space-y-1 text-right">
-              <p className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Data de Emissão</p>
-              <p className="font-medium">{new Date(estimate.date).toLocaleDateString('pt-BR')}</p>
+            <div className="text-right flex flex-col justify-center">
+              <p className={`text-2xl font-bold ${PRIMARY_TEXT_CLASS}`}>Gesso e Pintura</p>
+              <p className="text-sm text-slate-500 font-medium">CNPJ: 00.000.000/0001-00</p>
+              <p className="text-sm text-slate-500 font-medium">Telefone: (00) 00000-0000</p>
             </div>
           </div>
 
-          <div className="space-y-2">
-             <p className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Projeto</p>
-             <p className="font-semibold text-lg">{estimate.title}</p>
+          {/* Details Box */}
+          <div className="grid grid-cols-2 border border-slate-200 text-sm">
+            <div className="p-4 space-y-2 border-r border-slate-200">
+              <p><span className="font-bold">CLIENTE:</span> {estimate.client}</p>
+              <p><span className="font-bold">ENDEREÇO:</span> Não informado</p>
+            </div>
+            <div className="p-4 space-y-2">
+              <p><span className="font-bold">DATA:</span> {new Date(estimate.date).toLocaleDateString('pt-BR')}</p>
+              <p><span className="font-bold">VALIDADE:</span> 15 dias</p>
+            </div>
           </div>
 
           {/* Items Table */}
-          <div className="border border-slate-200 rounded-lg overflow-hidden">
+          <div className="border border-slate-200 overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50">
-                <tr className="text-slate-500 border-b border-slate-200">
-                  <th className="text-left p-3">Descrição</th>
-                  <th className="text-right p-3">Qtd</th>
-                  <th className="text-right p-3">Unit.</th>
-                  <th className="text-right p-3">Total</th>
+              <thead className={`${PRIMARY_COLOR_CLASS} text-white`}>
+                <tr>
+                  <th className="text-left p-3 font-bold">DESCRIÇÃO</th>
+                  <th className="text-center p-3 font-bold">UNID.</th>
+                  <th className="text-center p-3 font-bold">QUANT.</th>
+                  <th className="text-right p-3 font-bold">V. UNITÁRIO</th>
+                  <th className="text-right p-3 font-bold">V. TOTAL</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-100">
                 {estimate.items.map((item) => (
-                  <tr key={item.id} className="border-b border-slate-100 last:border-0">
+                  <tr key={item.id}>
                     <td className="p-3">{item.description}</td>
-                    <td className="p-3 text-right">{item.quantity} {item.unit}</td>
+                    <td className="p-3 text-center">{item.unit || 'un'}</td>
+                    <td className="p-3 text-center">{item.quantity}</td>
                     <td className="p-3 text-right">
                       {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.unitPrice)}
                     </td>
@@ -99,18 +99,39 @@ export function EstimatePreview({ estimate, onClose }: EstimatePreviewProps) {
           </div>
 
           {/* Total */}
-          <div className="flex justify-end pt-4">
-            <div className="bg-primary/5 p-4 rounded-lg border border-primary/10 text-right min-w-[200px]">
-              <p className="text-xs font-bold text-primary uppercase tracking-widest">Valor Total</p>
-              <p className="text-3xl font-black text-primary">
+          <div className="flex justify-end">
+            <div className={`${PRIMARY_COLOR_CLASS} text-white p-4 flex items-center gap-8 min-w-[300px]`}>
+              <p className="text-lg font-bold">TOTAL GERAL</p>
+              <p className="text-2xl font-black flex-1 text-right">
                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(estimate.amount)}
               </p>
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="text-center pt-12 text-[10px] text-slate-400 font-medium italic border-t border-slate-100">
-            Este documento é um orçamento válido por 15 dias. Gerado por EstimatePro.
+          {/* Payment and Observations */}
+          <div className="border border-slate-200 p-4 space-y-4 text-sm">
+            <div>
+              <p className="font-bold uppercase mb-1">Condições de Pagamento:</p>
+              <p>A combinar</p>
+            </div>
+            <div>
+              <p className="font-bold uppercase mb-1">Observações:</p>
+              <p>Este orçamento tem validade de 15 dias após a data de emissão.</p>
+            </div>
+          </div>
+
+          {/* Signatures */}
+          <div className="grid grid-cols-2 gap-20 pt-16">
+            <div className="text-center">
+              <div className="border-t border-slate-400 pt-2">
+                <p className="text-sm font-medium">Assinatura do Cliente</p>
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="border-t border-slate-400 pt-2">
+                <p className="text-sm font-medium">Responsável</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

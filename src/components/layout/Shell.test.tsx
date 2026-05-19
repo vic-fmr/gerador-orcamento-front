@@ -20,4 +20,9 @@ test('Shell renders sidebar and navbar', () => {
   expect(screen.getByRole('banner')).toBeInTheDocument()
   // Check for Main Content
   expect(screen.getByText('Main Content')).toBeInTheDocument()
+  
+  // Check for navigation links
+  expect(screen.getByRole('link', { name: /Painel/i })).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: /Orçamentos/i })).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: /Clientes/i })).toBeInTheDocument()
 })
