@@ -9,14 +9,14 @@
     - [ ] Implement hooks in `src/hooks/useClients.ts` using React Query to handle state and submissions.
 - [x] Task: Conductor - User Manual Verification 'Data Layer & State Management' (Protocol in workflow.md)
 
-## Phase 2: Client Creation UI (Slide-out Panel)
+## Phase 2: Client Creation UI (Slide-out Panel) [checkpoint: 94cfd76]
 - [x] Task: Create Client Form Component 570a715
     - [ ] Write failing test for `ClientForm` component rendering and Zod validation.
     - [ ] Implement `ClientForm.tsx` using `react-hook-form` and Shadcn UI inputs.
 - [x] Task: Create Slide-out Panel Component 0cc59e9
     - [ ] Write failing test to ensure the panel opens/closes and triggers form submission correctly.
     - [ ] Implement `CreateClientSheet.tsx` using Shadcn UI `Sheet`, wrapping the `ClientForm`.
-- [ ] Task: Conductor - User Manual Verification 'Client Creation UI' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Client Creation UI' (Protocol in workflow.md)
 
 ## Phase 3: Clients List Page
 - [ ] Task: Create Clients Table Component
