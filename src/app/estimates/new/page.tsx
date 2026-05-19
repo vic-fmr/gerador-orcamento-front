@@ -30,12 +30,13 @@ type EstimateFormValues = z.infer<typeof estimateSchema>
 export default function NewEstimatePage() {
   const router = useRouter()
   const addEstimate = useEstimateStore((state) => state.addEstimate)
+  const [step, setStep] = React.useState(1)
 
   const {
     register,
     handleSubmit,
     control,
-    setValue,
+    trigger,
     watch,
     formState: { errors, isSubmitting },
   } = useForm<EstimateFormValues>({
@@ -46,6 +47,8 @@ export default function NewEstimatePage() {
   })
 
   const items = watch('items')
+  const title = watch('title')
+  const client = watch('client')
 
   const onSubmit = (data: EstimateFormValues) => {
     const totalAmount = data.items.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0)
@@ -64,70 +67,164 @@ export default function NewEstimatePage() {
     router.push('/')
   }
 
+  const nextStep = async () => {
+    const fieldsToValidate = step === 1 ? ['title', 'client'] : ['items']
+    const result = await trigger(fieldsToValidate as any)
+    if (result) setStep(step + 1)
+  }
+
+  const prevStep = () => setStep(step - 1)
+
+  const totalAmount = items.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0)
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center gap-4">
-        <Link 
-          href="/" 
-          className="inline-flex items-center justify-center size-8 rounded-md hover:bg-muted transition-colors"
-          aria-label="Voltar"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-        <h2 className="text-3xl font-bold tracking-tight">Novo Orçamento</h2>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link 
+            href="/" 
+            className="inline-flex items-center justify-center size-8 rounded-md hover:bg-muted transition-colors"
+            aria-label="Voltar"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+          <h2 className="text-3xl font-bold tracking-tight">Novo Orçamento</h2>
+        </div>
+        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+          <span className={step === 1 ? 'text-primary font-bold' : ''}>1. Detalhes</span>
+          <span className="w-4 h-px bg-border"></span>
+          <span className={step === 2 ? 'text-primary font-bold' : ''}>2. Itens</span>
+          <span className="w-4 h-px bg-border"></span>
+          <span className={step === 3 ? 'text-primary font-bold' : ''}>3. Revisão</span>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 bg-card p-6 rounded-xl shadow-sm border border-border">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="title">Título do Projeto</Label>
-            <Input
-              id="title"
-              placeholder="Ex: Reforma de Cozinha"
-              {...register('title')}
-            />
-            {errors.title && (
-              <p className="text-sm font-medium text-destructive">{errors.title.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="client">Cliente</Label>
-            <Input
-              id="client"
-              placeholder="Ex: João da Silva"
-              {...register('client')}
-            />
-            {errors.client && (
-              <p className="text-sm font-medium text-destructive">{errors.client.message}</p>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <Controller
-            control={control}
-            name="items"
-            render={({ field }) => (
-              <LineItemsEditor
-                items={field.value}
-                onChange={field.onChange}
+        {step === 1 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-left-4 duration-300">
+            <div className="space-y-2">
+              <Label htmlFor="title">Título do Projeto</Label>
+              <Input
+                id="title"
+                placeholder="Ex: Reforma de Cozinha"
+                {...register('title')}
               />
-            )}
-          />
-          {errors.items && (
-            <p className="text-sm font-medium text-destructive">{errors.items.message}</p>
-          )}
-        </div>
+              {errors.title && (
+                <p className="text-sm font-medium text-destructive">{errors.title.message}</p>
+              )}
+            </div>
 
-        <div className="flex justify-end gap-4">
-          <Button variant="outline" type="button" onClick={() => router.push('/')}>
-            Cancelar
-          </Button>
-          <Button type="submit" disabled={isSubmitting} className="bg-primary hover:bg-primary/90">
-            <Save className="mr-2 h-4 w-4" />
-            Salvar Orçamento
-          </Button>
+            <div className="space-y-2">
+              <Label htmlFor="client">Cliente</Label>
+              <Input
+                id="client"
+                placeholder="Ex: João da Silva"
+                {...register('client')}
+              />
+              {errors.client && (
+                <p className="text-sm font-medium text-destructive">{errors.client.message}</p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+            <Controller
+              control={control}
+              name="items"
+              render={({ field }) => (
+                <LineItemsEditor
+                  items={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+            {errors.items && (
+              <p className="text-sm font-medium text-destructive">{errors.items.message}</p>
+            )}
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
+            <div className="grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg">
+              <div>
+                <Label className="text-muted-foreground">Projeto</Label>
+                <p className="font-semibold text-lg">{title}</p>
+              </div>
+              <div>
+                <Label className="text-muted-foreground">Cliente</Label>
+                <p className="font-semibold text-lg">{client}</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-muted-foreground">Resumo dos Itens</Label>
+              <div className="border border-border rounded-lg overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/50">
+                    <tr>
+                      <th className="text-left p-2">Descrição</th>
+                      <th className="text-right p-2">Qtd</th>
+                      <th className="text-right p-2">Unit.</th>
+                      <th className="text-right p-2">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((item) => (
+                      <tr key={item.id} className="border-t border-border">
+                        <td className="p-2">{item.description}</td>
+                        <td className="p-2 text-right">{item.quantity}</td>
+                        <td className="p-2 text-right">
+                          {item.unitPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                        </td>
+                        <td className="p-2 text-right font-medium">
+                          {(item.quantity * item.unitPrice).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="flex justify-end p-4 bg-primary/5 rounded-lg border border-primary/10">
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground font-medium">Total do Orçamento</p>
+                <p className="text-3xl font-bold text-primary">
+                  {totalAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-between gap-4 pt-4 border-t border-border">
+          <div className="flex gap-4">
+            {step > 1 ? (
+              <Button variant="outline" type="button" onClick={prevStep}>
+                Anterior
+              </Button>
+            ) : (
+              <Button variant="outline" type="button" onClick={() => router.push('/')}>
+                Cancelar
+              </Button>
+            )}
+          </div>
+          
+          <div className="flex gap-4">
+            {step < 3 ? (
+              <Button type="button" onClick={nextStep} className="bg-primary hover:bg-primary/90">
+                Próximo
+              </Button>
+            ) : (
+              <Button type="submit" disabled={isSubmitting} className="bg-primary hover:bg-primary/90">
+                <Save className="mr-2 h-4 w-4" />
+                Salvar Orçamento
+              </Button>
+            )}
+          </div>
         </div>
       </form>
     </div>
