@@ -20,6 +20,6 @@
 ## Phase 3: Document Export & History
 - [x] Task: Implement Estimate History list with search and filtering (fa593f6)
 - [x] Task: Integrate jspdf for basic branded PDF export (9621b53)
-- [ ] Task: Implement Document Preview before download
+- [x] Task: Implement Document Preview before download (22f7d16)
 - [ ] Task: Final responsive polish for mobile field work
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Document Export & History' (Protocol in workflow.md)
