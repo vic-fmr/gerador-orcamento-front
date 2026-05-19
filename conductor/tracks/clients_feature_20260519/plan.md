@@ -18,7 +18,7 @@
     - [ ] Implement `CreateClientSheet.tsx` using Shadcn UI `Sheet`, wrapping the `ClientForm`.
 - [x] Task: Conductor - User Manual Verification 'Client Creation UI' (Protocol in workflow.md)
 
-## Phase 3: Clients List Page
+## Phase 3: Clients List Page [checkpoint: 6e1eab5]
 - [x] Task: Create Clients Table Component aeda494
     - [ ] Write failing test for `ClientsTable` to verify it renders correct columns and mock data rows.
     - [ ] Implement `ClientsTable.tsx` using Shadcn UI `Table`.
@@ -27,4 +27,4 @@
     - [x] Create `src/app/clients/page.tsx` integrating the Table and the Sheet trigger.
 - [x] Task: Add Navigation Link 5af8c0d
     - [x] Update `src/components/layout/Shell.tsx` to include a navigation link to `/clients`.
-- [ ] Task: Conductor - User Manual Verification 'Clients List Page' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Clients List Page' (Protocol in workflow.md) 6e1eab5
