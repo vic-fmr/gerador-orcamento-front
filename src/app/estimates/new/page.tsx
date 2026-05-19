@@ -13,6 +13,7 @@ import { useEstimateStore, LineItem } from '@/store/useEstimateStore'
 import Link from 'next/link'
 import { LineItemsEditor } from '@/components/estimates/LineItemsEditor'
 import { Controller } from 'react-hook-form'
+import { useCreateEstimate } from '@/hooks/useEstimates'
 
 const estimateSchema = z.object({
   title: z.string().min(3, 'O título deve ter pelo menos 3 caracteres'),
@@ -29,8 +30,8 @@ type EstimateFormValues = z.infer<typeof estimateSchema>
 
 export default function NewEstimatePage() {
   const router = useRouter()
-  const addEstimate = useEstimateStore((state) => state.addEstimate)
   const [step, setStep] = React.useState(1)
+  const createEstimate = useCreateEstimate()
 
   const {
     register,
@@ -38,7 +39,7 @@ export default function NewEstimatePage() {
     control,
     trigger,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<EstimateFormValues>({
     resolver: zodResolver(estimateSchema),
     defaultValues: {
@@ -63,9 +64,14 @@ export default function NewEstimatePage() {
       items: data.items,
     }
     
-    addEstimate(newEstimate)
-    router.push('/')
+    createEstimate.mutate(newEstimate, {
+      onSuccess: () => {
+        router.push('/')
+      }
+    })
   }
+
+  const isSubmitting = createEstimate.isPending
 
   const nextStep = async () => {
     const fieldsToValidate = step === 1 ? ['title', 'client'] : ['items']

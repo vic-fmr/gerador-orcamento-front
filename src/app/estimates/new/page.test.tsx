@@ -1,6 +1,15 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import NewEstimate from '@/app/estimates/new/page'
 import { expect, test, vi } from 'vitest'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+})
 
 // Mock usePathname and useRouter
 vi.mock('next/navigation', () => ({
@@ -11,7 +20,11 @@ vi.mock('next/navigation', () => ({
 }))
 
 test('New Estimate page follows a wizard flow', async () => {
-  render(<NewEstimate />)
+  render(
+    <QueryClientProvider client={queryClient}>
+      <NewEstimate />
+    </QueryClientProvider>
+  )
   
   // Step 1: Project Details
   expect(screen.getByLabelText(/título/i)).toBeInTheDocument()

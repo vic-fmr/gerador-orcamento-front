@@ -19,10 +19,12 @@ import {
   CardDescription 
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { useEstimates } from '@/hooks/useEstimates'
 import { useEstimateStore } from '@/store/useEstimateStore'
 
 export default function Home() {
-  const { estimates, getStats } = useEstimateStore()
+  const { data: estimates = [], isLoading } = useEstimates()
+  const { getStats } = useEstimateStore()
   const statsData = getStats()
 
   const stats = [
@@ -102,36 +104,46 @@ export default function Home() {
           </CardHeader>
           <CardContent>
              <div className="space-y-4">
-                {estimates.slice(0, 5).map((estimate) => (
-                  <div key={estimate.id} className="flex items-center justify-between p-3 bg-card rounded-lg border border-border/50">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded bg-primary/10 flex items-center justify-center">
-                        <LucideFileText className="w-5 h-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">{estimate.title}</p>
-                        <p className="text-xs text-muted-foreground">Cliente: {estimate.client}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                       <p className="text-sm font-semibold">
-                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(estimate.amount)}
-                       </p>
-                       <p className={cn(
-                         "text-[10px] font-medium px-1.5 py-0.5 rounded-full inline-block capitalize",
-                         estimate.status === 'pending' && "text-yellow-600 bg-yellow-100",
-                         estimate.status === 'approved' && "text-green-600 bg-green-100",
-                         estimate.status === 'paid' && "text-blue-600 bg-blue-100"
-                       )}>
-                         {estimate.status === 'pending' ? 'pendente' : estimate.status === 'approved' ? 'aprovado' : 'pago'}
-                       </p>
-                    </div>
+                {isLoading ? (
+                  <div className="flex flex-col gap-4">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="h-16 w-full animate-pulse bg-muted rounded-lg" />
+                    ))}
                   </div>
-                ))}
-                {estimates.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Nenhum orçamento encontrado. Crie o seu primeiro!
-                  </div>
+                ) : (
+                  <>
+                    {estimates.slice(0, 5).map((estimate) => (
+                      <div key={estimate.id} className="flex items-center justify-between p-3 bg-card rounded-lg border border-border/50">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded bg-primary/10 flex items-center justify-center">
+                            <LucideFileText className="w-5 h-5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">{estimate.title}</p>
+                            <p className="text-xs text-muted-foreground">Cliente: {estimate.client}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold">
+                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(estimate.amount)}
+                          </p>
+                          <p className={cn(
+                            "text-[10px] font-medium px-1.5 py-0.5 rounded-full inline-block capitalize",
+                            estimate.status === 'pending' && "text-yellow-600 bg-yellow-100",
+                            estimate.status === 'approved' && "text-green-600 bg-green-100",
+                            estimate.status === 'paid' && "text-blue-600 bg-blue-100"
+                          )}>
+                            {estimate.status === 'pending' ? 'pendente' : estimate.status === 'approved' ? 'aprovado' : 'pago'}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                    {estimates.length === 0 && (
+                      <div className="text-center py-8 text-muted-foreground">
+                        Nenhum orçamento encontrado. Crie o seu primeiro!
+                      </div>
+                    )}
+                  </>
                 )}
              </div>
           </CardContent>
