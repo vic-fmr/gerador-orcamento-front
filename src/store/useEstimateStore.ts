@@ -7,6 +7,7 @@ export interface LineItem {
   description: string
   quantity: number
   unitPrice: number
+  unit: string
 }
 
 export interface Estimate {

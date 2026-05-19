@@ -16,6 +16,7 @@ test('Store adds an estimate', () => {
     amount: 1000,
     status: 'pending' as const,
     date: new Date().toISOString(),
+    items: [],
   }
   
   act(() => {
@@ -30,10 +31,10 @@ test('Store calculates summary stats correctly', () => {
   const { result } = renderHook(() => useEstimateStore())
   
   act(() => {
-    result.current.addEstimate({ id: '1', amount: 1000, status: 'pending', title: '', client: '', date: '' })
-    result.current.addEstimate({ id: '2', amount: 2000, status: 'approved', title: '', client: '', date: '' })
-    result.current.addEstimate({ id: '3', amount: 3000, status: 'paid', title: '', client: '', date: '' })
-    result.current.addEstimate({ id: '4', amount: 500, status: 'pending', title: '', client: '', date: '' })
+    result.current.addEstimate({ id: '1', amount: 1000, status: 'pending', title: '', client: '', date: '', items: [] })
+    result.current.addEstimate({ id: '2', amount: 2000, status: 'approved', title: '', client: '', date: '', items: [] })
+    result.current.addEstimate({ id: '3', amount: 3000, status: 'paid', title: '', client: '', date: '', items: [] })
+    result.current.addEstimate({ id: '4', amount: 500, status: 'pending', title: '', client: '', date: '', items: [] })
   })
   
   const stats = result.current.getStats()

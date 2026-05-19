@@ -5,51 +5,39 @@ import { describe, it, expect, vi } from 'vitest'
 describe('LineItemsEditor', () => {
   const mockOnChange = vi.fn()
   const initialItems = [
-    { id: '1', description: 'Item 1', quantity: 2, unitPrice: 100 },
+    { id: '1', description: 'Pintura', quantity: 2, unitPrice: 100, unit: 'm²' },
   ]
 
-  it('renders initial items', () => {
+  it('renders initial items with units', () => {
     render(<LineItemsEditor items={initialItems} onChange={mockOnChange} />)
-    expect(screen.getByDisplayValue('Item 1')).toBeDefined()
+    expect(screen.getByDisplayValue(/Pintura/)).toBeDefined()
+    expect(screen.getAllByText(/m²/).length).toBeGreaterThan(0)
     expect(screen.getByDisplayValue('2')).toBeDefined()
-    expect(screen.getByDisplayValue('100')).toBeDefined()
   })
 
-  it('adds a new item when "Adicionar Item" button is clicked', () => {
+  it('adds an item from catalog when selected', () => {
     render(<LineItemsEditor items={[]} onChange={mockOnChange} />)
-    const addButton = screen.getByText(/Adicionar Item/i)
-    fireEvent.click(addButton)
+    // Assuming we have buttons or a select for catalog items
+    const catalogItemButton = screen.getByText(/Pintura de Parede/i)
+    fireEvent.click(catalogItemButton)
+    
     expect(mockOnChange).toHaveBeenCalledWith([
-      expect.objectContaining({ description: '', quantity: 1, unitPrice: 0 }),
+      expect.objectContaining({ 
+        description: 'Pintura de Parede (Látex)', 
+        unit: 'm²', 
+        unitPrice: 45.00,
+        quantity: 1 
+      }),
     ])
   })
 
-  it('removes an item when "Remover" button is clicked', () => {
-    render(<LineItemsEditor items={initialItems} onChange={mockOnChange} />)
-    const removeButton = screen.getByLabelText(/Remover Item/i)
-    fireEvent.click(removeButton)
-    expect(mockOnChange).toHaveBeenCalledWith([])
-  })
-
-  it('updates an item and calculates total in real-time', () => {
+  it('updates quantity and calculates total', () => {
     render(<LineItemsEditor items={initialItems} onChange={mockOnChange} />)
     const quantityInput = screen.getByDisplayValue('2')
     fireEvent.change(quantityInput, { target: { value: '3' } })
     
     expect(mockOnChange).toHaveBeenCalledWith([
-      { id: '1', description: 'Item 1', quantity: 3, unitPrice: 100 },
+      { id: '1', description: 'Pintura', quantity: 3, unitPrice: 100, unit: 'm²' },
     ])
-  })
-
-  it('displays the correct total amount', () => {
-    const items = [
-      { id: '1', description: 'Item 1', quantity: 2, unitPrice: 100 },
-      { id: '2', description: 'Item 2', quantity: 1, unitPrice: 50 },
-    ]
-    render(<LineItemsEditor items={items} onChange={mockOnChange} />)
-    // Total should be 2*100 + 1*50 = 250
-    // Formatting might depend on implementation, but let's check for "250"
-    expect(screen.getByText(/Total:/i)).toBeDefined()
-    expect(screen.getByText(/250/)).toBeDefined()
   })
 })

@@ -14,15 +14,17 @@ import Link from 'next/link'
 import { LineItemsEditor } from '@/components/estimates/LineItemsEditor'
 import { Controller } from 'react-hook-form'
 import { useCreateEstimate } from '@/hooks/useEstimates'
+import { ClientSelect } from '@/components/estimates/ClientSelect'
 
 const estimateSchema = z.object({
   title: z.string().min(3, 'O título deve ter pelo menos 3 caracteres'),
-  client: z.string().min(2, 'O nome do cliente é obrigatório'),
+  client: z.string().min(1, 'O cliente é obrigatório'),
   items: z.array(z.object({
     id: z.string(),
     description: z.string().min(1, 'Descrição é obrigatória'),
-    quantity: z.number().min(1),
+    quantity: z.number().min(0.01),
     unitPrice: z.number().min(0),
+    unit: z.string(),
   })).min(1, 'Adicione pelo menos um item'),
 })
 
@@ -44,12 +46,13 @@ export default function NewEstimatePage() {
     resolver: zodResolver(estimateSchema),
     defaultValues: {
       items: [],
+      client: '',
     },
   })
 
   const items = watch('items')
   const title = watch('title')
-  const client = watch('client')
+  const clientName = watch('client')
 
   const onSubmit = (data: EstimateFormValues) => {
     const totalAmount = data.items.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0)
@@ -71,15 +74,17 @@ export default function NewEstimatePage() {
     })
   }
 
-  const isSubmitting = createEstimate.isPending
-
-  const nextStep = async () => {
+  const nextStep = async (e?: React.MouseEvent) => {
+    if (e) e.preventDefault()
     const fieldsToValidate = step === 1 ? ['title', 'client'] : ['items']
     const result = await trigger(fieldsToValidate as any)
     if (result) setStep(step + 1)
   }
 
-  const prevStep = () => setStep(step - 1)
+  const prevStep = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setStep(step - 1)
+  }
 
   const totalAmount = items.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0)
 
@@ -105,7 +110,16 @@ export default function NewEstimatePage() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 bg-card p-6 rounded-xl shadow-sm border border-border">
+      <form 
+        onSubmit={step === 3 ? handleSubmit(onSubmit) : (e) => e.preventDefault()} 
+        className="space-y-8 bg-card p-6 rounded-xl shadow-sm border border-border"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && step < 3) {
+            e.preventDefault()
+            nextStep()
+          }
+        }}
+      >
         {step === 1 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-left-4 duration-300">
             <div className="space-y-2">
@@ -122,10 +136,16 @@ export default function NewEstimatePage() {
 
             <div className="space-y-2">
               <Label htmlFor="client">Cliente</Label>
-              <Input
-                id="client"
-                placeholder="Ex: João da Silva"
-                {...register('client')}
+              <Controller
+                control={control}
+                name="client"
+                render={({ field }) => (
+                  <ClientSelect
+                    id="client"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
               />
               {errors.client && (
                 <p className="text-sm font-medium text-destructive">{errors.client.message}</p>
@@ -161,7 +181,7 @@ export default function NewEstimatePage() {
               </div>
               <div>
                 <Label className="text-muted-foreground">Cliente</Label>
-                <p className="font-semibold text-lg">{client}</p>
+                <p className="font-semibold text-lg">{clientName}</p>
               </div>
             </div>
 
@@ -225,7 +245,7 @@ export default function NewEstimatePage() {
                 Próximo
               </Button>
             ) : (
-              <Button type="submit" disabled={isSubmitting} className="bg-primary hover:bg-primary/90">
+              <Button type="submit" disabled={createEstimate.isPending} className="bg-primary hover:bg-primary/90">
                 <Save className="mr-2 h-4 w-4" />
                 Salvar Orçamento
               </Button>
