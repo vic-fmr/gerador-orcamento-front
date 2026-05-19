@@ -37,7 +37,7 @@ describe('ClientsPage', () => {
   it('renders clients table with data', () => {
     render(<ClientsPage />, { wrapper })
     
-    expect(screen.getByText('John Doe')).toBeInTheDocument()
-    expect(screen.getByText('john@example.com')).toBeInTheDocument()
+    expect(screen.getAllByText('John Doe').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('john@example.com').length).toBeGreaterThan(0)
   })
 })

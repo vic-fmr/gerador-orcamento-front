@@ -12,27 +12,30 @@ describe('ClientsTable', () => {
   it('renders correct headers', () => {
     render(<ClientsTable clients={mockClients} />)
     
-    expect(screen.getByText('Nome')).toBeInTheDocument()
-    expect(screen.getByText('Email')).toBeInTheDocument()
-    expect(screen.getByText('Telefone')).toBeInTheDocument()
-    expect(screen.getByText('Endereço')).toBeInTheDocument()
+    expect(screen.getByText('Cliente / Nome')).toBeInTheDocument()
+    expect(screen.getAllByText('Contato').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Endereço').length).toBeGreaterThan(0)
+    expect(screen.getByText('Ações')).toBeInTheDocument()
   })
 
   it('renders client data rows correctly', () => {
     render(<ClientsTable clients={mockClients} />)
     
-    // John Doe should have all fields rendered
-    expect(screen.getByText('John Doe')).toBeInTheDocument()
-    expect(screen.getByText('john@example.com')).toBeInTheDocument()
-    expect(screen.getByText('1234567890')).toBeInTheDocument()
+    // John Doe should have all fields rendered (in both views)
+    expect(screen.getAllByText('John Doe').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('john@example.com').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('1234567890').length).toBeGreaterThan(0)
     
     // Check if address cell contains both address and addressName logic
-    const addressElement = screen.getByText(/123 Main St/i)
-    expect(addressElement).toBeInTheDocument()
+    const addressElements = screen.getAllByText(/123 Main St/i)
+    expect(addressElements.length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Home').length).toBeGreaterThan(0)
     
-    // Jane Smith has missing fields, should render fallbacks or be empty
-    expect(screen.getByText('Jane Smith')).toBeInTheDocument()
-    expect(screen.getByText('jane@example.com')).toBeInTheDocument()
+    // Jane Smith has missing fields, should render fallbacks
+    expect(screen.getAllByText('Jane Smith').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('jane@example.com').length).toBeGreaterThan(0)
+    // Check for N/A for missing phone
+    expect(screen.getAllByText('N/A').length).toBeGreaterThan(0)
   })
 
   it('renders empty state when no clients provided', () => {

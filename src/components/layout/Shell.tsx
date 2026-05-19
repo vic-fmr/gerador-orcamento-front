@@ -31,13 +31,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside 
         className={cn(
-          "bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300 ease-in-out z-20",
+          "bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300 ease-in-out z-20 p-2",
           isSidebarOpen ? "w-64" : "w-20"
         )}
         role="navigation"
         aria-label="Barra Lateral"
       >
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full bg-sidebar-card rounded-xl overflow-hidden border border-sidebar-border shadow-sm">
           {/* Logo / Brand */}
           <div className="h-16 flex items-center px-6 border-b border-sidebar-border overflow-hidden whitespace-nowrap">
             <div className="w-8 h-8 bg-sidebar-primary rounded-md flex items-center justify-center shrink-0">
