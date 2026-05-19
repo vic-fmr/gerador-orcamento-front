@@ -19,7 +19,7 @@
 - [x] Task: Conductor - User Manual Verification 'Client Creation UI' (Protocol in workflow.md)
 
 ## Phase 3: Clients List Page
-- [ ] Task: Create Clients Table Component
+- [x] Task: Create Clients Table Component aeda494
     - [ ] Write failing test for `ClientsTable` to verify it renders correct columns and mock data rows.
     - [ ] Implement `ClientsTable.tsx` using Shadcn UI `Table`.
 - [ ] Task: Implement Main Clients Route
