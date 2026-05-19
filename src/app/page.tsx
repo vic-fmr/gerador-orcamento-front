@@ -2,21 +2,21 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { 
-  Plus, 
-  Clock, 
-  CheckCircle2, 
+import {
+  Plus,
+  Clock,
+  CheckCircle2,
   CreditCard,
   ArrowUpRight,
   TrendingUp,
   FileText as LucideFileText
 } from 'lucide-react'
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
+import {
+  Card,
+  CardContent,
+  CardHeader,
   CardTitle,
-  CardDescription 
+  CardDescription
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useEstimates } from '@/hooks/useEstimates'
@@ -29,29 +29,29 @@ export default function Home() {
   const statsData = getStats()
 
   const stats = [
-    { 
-      name: 'Pendentes', 
-      value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(statsData.pending.value), 
-      count: statsData.pending.count, 
-      icon: Clock, 
-      color: 'text-yellow-500', 
-      bg: 'bg-yellow-500/10' 
+    {
+      name: 'Pendentes',
+      value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(statsData.pending.value),
+      count: statsData.pending.count,
+      icon: Clock,
+      color: 'text-yellow-500',
+      bg: 'bg-yellow-500/10'
     },
-    { 
-      name: 'Aprovados', 
-      value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(statsData.approved.value), 
-      count: statsData.approved.count, 
-      icon: CheckCircle2, 
-      color: 'text-green-500', 
-      bg: 'bg-green-500/10' 
+    {
+      name: 'Aprovados',
+      value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(statsData.approved.value),
+      count: statsData.approved.count,
+      icon: CheckCircle2,
+      color: 'text-green-500',
+      bg: 'bg-green-500/10'
     },
-    { 
-      name: 'Pagos', 
-      value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(statsData.paid.value), 
-      count: statsData.paid.count, 
-      icon: CreditCard, 
-      color: 'text-blue-500', 
-      bg: 'bg-blue-500/10' 
+    {
+      name: 'Pagos',
+      value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(statsData.paid.value),
+      count: statsData.paid.count,
+      icon: CreditCard,
+      color: 'text-blue-500',
+      bg: 'bg-blue-500/10'
     },
   ]
 
@@ -65,8 +65,8 @@ export default function Home() {
             Bem-vindo de volta! Veja o que está acontecendo com seus orçamentos.
           </p>
         </div>
-        <Link 
-          href="/estimates/new" 
+        <Link
+          href="/estimates/new"
           className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -96,7 +96,7 @@ export default function Home() {
 
       {/* Main Grid for recent activity or charts */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4 shadow-sm border-none bg-secondary/5">
+        <Card className="col-span-7 shadow-sm border-none bg-secondary/5">
           <CardHeader>
             <CardTitle>Atividade Recente</CardTitle>
             <CardDescription>
@@ -104,52 +104,54 @@ export default function Home() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-             <div className="space-y-4">
-                {isLoading ? (
-                  <div className="flex flex-col gap-4">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="h-16 w-full animate-pulse bg-muted rounded-lg" />
-                    ))}
-                  </div>
-                ) : (
-                  <>
-                    {estimates.slice(0, 5).map((estimate) => (
-                      <div key={estimate.id} className="flex items-center justify-between p-3 bg-card rounded-lg border border-border/50">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded bg-primary/10 flex items-center justify-center">
-                            <LucideFileText className="w-5 h-5 text-primary" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-sm">{estimate.title}</p>
-                            <p className="text-xs text-muted-foreground">Cliente: {estimate.client}</p>
-                          </div>
+            <div className="space-y-4">
+              {isLoading ? (
+                <div className="flex flex-col gap-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-16 w-full animate-pulse bg-muted rounded-lg" />
+                  ))}
+                </div>
+              ) : (
+                <>
+                  {estimates.slice(0, 5).map((estimate) => (
+                    <div key={estimate.id} className="flex items-center justify-between p-3 bg-card rounded-lg border border-border/50">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded bg-primary/10 flex items-center justify-center">
+                          <LucideFileText className="w-5 h-5 text-primary" />
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm font-semibold">
-                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(estimate.amount)}
-                          </p>
-                          <p className={cn(
-                            "text-[10px] font-medium px-1.5 py-0.5 rounded-full inline-block capitalize",
-                            estimate.status === 'pending' && "text-yellow-600 bg-yellow-100",
-                            estimate.status === 'approved' && "text-green-600 bg-green-100",
-                            estimate.status === 'paid' && "text-blue-600 bg-blue-100"
-                          )}>
-                            {estimate.status === 'pending' ? 'pendente' : estimate.status === 'approved' ? 'aprovado' : 'pago'}
-                          </p>
+                        <div>
+                          <p className="font-medium text-sm">{estimate.title}</p>
+                          <p className="text-xs text-muted-foreground">Cliente: {estimate.client}</p>
                         </div>
                       </div>
-                    ))}
-                    {estimates.length === 0 && (
-                      <div className="text-center py-8 text-muted-foreground">
-                        Nenhum orçamento encontrado. Crie o seu primeiro!
+                      <div className="text-right">
+                        <p className="text-sm font-semibold">
+                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(estimate.amount)}
+                        </p>
+                        <p className={cn(
+                          "text-[10px] font-medium px-1.5 py-0.5 rounded-full inline-block capitalize",
+                          estimate.status === 'pending' && "text-yellow-600 bg-yellow-100",
+                          estimate.status === 'approved' && "text-green-600 bg-green-100",
+                          estimate.status === 'paid' && "text-blue-600 bg-blue-100"
+                        )}>
+                          {estimate.status === 'pending' ? 'pendente' : estimate.status === 'approved' ? 'aprovado' : 'pago'}
+                        </p>
                       </div>
-                    )}
-                  </>
-                )}
-             </div>
+                    </div>
+                  ))}
+                  {estimates.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      Nenhum orçamento encontrado. Crie o seu primeiro!
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </CardContent>
         </Card>
 
+        {/* 
+        Inativo - Dashboard de crescimento de receita - pode ser reativado futuramente
         <Card className="col-span-3 shadow-sm border-none bg-primary text-primary-foreground">
            <CardHeader>
              <CardTitle className="flex items-center justify-between">
@@ -167,7 +169,7 @@ export default function Home() {
                 <ArrowUpRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </Button>
            </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   )

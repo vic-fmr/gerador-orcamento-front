@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react'
 import { useEstimates } from '@/hooks/useEstimates'
-import { Search, ArrowUpDown, Download, Eye, Calendar, User, DollarSign, FileEdit } from 'lucide-react'
+import { Search, ArrowUpDown, Download, Eye, Calendar, User, DollarSign, FileEdit, Plus } from 'lucide-react'
+import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -19,8 +20,8 @@ export default function EstimatesHistory() {
   const [selectedPreview, setSelectedPreview] = useState<Estimate | null>(null)
 
   const filteredEstimates = estimates.filter((e) => {
-    const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          e.client.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      e.client.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFilter === 'all' || e.status === statusFilter
     return matchesSearch && matchesStatus
   })
@@ -29,11 +30,11 @@ export default function EstimatesHistory() {
     <span className={cn(
       "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase",
       status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-      status === 'approved' ? 'bg-green-100 text-green-700' :
-      'bg-blue-100 text-blue-700'
+        status === 'approved' ? 'bg-green-100 text-green-700' :
+          'bg-blue-100 text-blue-700'
     )}>
-      {status === 'pending' ? 'Pendente' : 
-       status === 'approved' ? 'Aprovado' : 'Pago'}
+      {status === 'pending' ? 'Pendente' :
+        status === 'approved' ? 'Aprovado' : 'Pago'}
     </span>
   )
 
@@ -41,7 +42,16 @@ export default function EstimatesHistory() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h2 className="text-3xl font-bold tracking-tight">Histórico de Orçamentos</h2>
+        <Link
+          href="/estimates/new"
+          className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Novo Orçamento
+        </Link>
       </div>
+
+
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-card p-4 rounded-xl border border-border shadow-sm">
         <div className="md:col-span-2 space-y-1.5">
@@ -72,10 +82,10 @@ export default function EstimatesHistory() {
           </select>
         </div>
         <div className="flex items-end">
-           <Button variant="outline" className="w-full" type="button">
-             <ArrowUpDown className="mr-2 h-4 w-4" />
-             Ordenar por Data
-           </Button>
+          <Button variant="outline" className="w-full" type="button">
+            <ArrowUpDown className="mr-2 h-4 w-4" />
+            Ordenar por Data
+          </Button>
         </div>
       </div>
 
@@ -114,22 +124,22 @@ export default function EstimatesHistory() {
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(estimate.amount)}
                   </td>
                   <td className="p-4 text-center">
-                     <StatusBadge status={estimate.status} />
+                    <StatusBadge status={estimate.status} />
                   </td>
                   <td className="p-4 text-right">
                     <div className="flex justify-end gap-2">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         type="button"
                         onClick={() => setSelectedPreview(estimate)}
                         title="Ver Prévia"
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         type="button"
                         onClick={() => generateEstimateDOCX(estimate)}
                         title="Download DOCX"
@@ -137,9 +147,9 @@ export default function EstimatesHistory() {
                       >
                         <FileEdit className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         type="button"
                         onClick={() => generateEstimatePDF(estimate)}
                         title="Download PDF"
@@ -184,35 +194,35 @@ export default function EstimatesHistory() {
 
               <div className="grid grid-cols-2 gap-4 pt-2">
                 <div className="space-y-1">
-                   <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                     <User className="h-3 w-3" />
-                     Cliente
-                   </div>
-                   <p className="text-sm font-medium">{estimate.client}</p>
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    <User className="h-3 w-3" />
+                    Cliente
+                  </div>
+                  <p className="text-sm font-medium">{estimate.client}</p>
                 </div>
                 <div className="space-y-1">
-                   <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                     <DollarSign className="h-3 w-3" />
-                     Valor
-                   </div>
-                   <p className="text-sm font-bold text-primary">
-                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(estimate.amount)}
-                   </p>
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    <DollarSign className="h-3 w-3" />
+                    Valor
+                  </div>
+                  <p className="text-sm font-bold text-primary">
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(estimate.amount)}
+                  </p>
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
-                  className="flex-1 h-9 gap-2" 
+                  className="flex-1 h-9 gap-2"
                   onClick={() => setSelectedPreview(estimate)}
                 >
                   <Eye className="h-4 w-4" />
                   Ver Prévia
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   className="flex-1 h-9 gap-2 text-blue-600 hover:bg-blue-50"
                   onClick={() => generateEstimateDOCX(estimate)}
@@ -220,8 +230,8 @@ export default function EstimatesHistory() {
                   <FileEdit className="h-4 w-4" />
                   DOCX
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   className="flex-1 h-9 gap-2 text-primary hover:bg-primary/5"
                   onClick={() => generateEstimatePDF(estimate)}
@@ -236,9 +246,9 @@ export default function EstimatesHistory() {
       </div>
 
       {selectedPreview && (
-        <EstimatePreview 
-          estimate={selectedPreview} 
-          onClose={() => setSelectedPreview(null)} 
+        <EstimatePreview
+          estimate={selectedPreview}
+          onClose={() => setSelectedPreview(null)}
         />
       )}
     </div>

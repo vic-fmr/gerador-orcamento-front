@@ -12,23 +12,18 @@ import { Button } from '@/components/ui/button'
 export default function ClientsPage() {
   const { data: clients, isLoading } = useClients()
   const [searchTerm, setSearchTerm] = React.useState('')
-  const [statusFilter, setStatusFilter] = React.useState('all')
 
   const filteredClients = clients?.filter((client) => {
     const matchesSearch = client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       client.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === 'all'
-    return matchesSearch && matchesStatus
+    return matchesSearch
   }) || []
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Clientes</h2>
-          <p className="text-muted-foreground mt-1">
-            Gerencie o cadastro de clientes e as informações de contato.
-          </p>
         </div>
         <CreateClientSheet />
       </div>
