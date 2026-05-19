@@ -4,7 +4,7 @@
 - [x] Task: Update Client Store and Types 58ab483
     - [ ] Update `src/store/useClientStore.ts` interface to match the new schema (`name`, `email`, `phone`, `address`, `addressName`).
     - [ ] Update mock data to reflect the new structure.
-- [ ] Task: Create Client API Hooks
+- [x] Task: Create Client API Hooks 9697bfd
     - [ ] Write failing test for `useCreateClient` and `useGetClients` hooks (mocking API call).
     - [ ] Implement hooks in `src/hooks/useClients.ts` using React Query to handle state and submissions.
 - [ ] Task: Conductor - User Manual Verification 'Data Layer & State Management' (Protocol in workflow.md)
