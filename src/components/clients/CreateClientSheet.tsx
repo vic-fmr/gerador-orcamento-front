@@ -34,7 +34,7 @@ export function CreateClientSheet() {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger 
+      <SheetTrigger
         render={
           <Button>
             <Plus className="mr-2 h-4 w-4" />
@@ -42,16 +42,16 @@ export function CreateClientSheet() {
           </Button>
         }
       />
-      <SheetContent className="w-full sm:max-w-md overflow-y-auto">
+      <SheetContent className="w-full p-2 sm:max-w-md overflow-y-auto lg:px-6 ">
         <SheetHeader className="mb-6">
           <SheetTitle>Adicionar Novo Cliente</SheetTitle>
           <SheetDescription>
             Preencha os dados do cliente abaixo. As informações serão salvas imediatamente.
           </SheetDescription>
         </SheetHeader>
-        <ClientForm 
-          onSubmit={handleSubmit} 
-          isSubmitting={createClient.isPending} 
+        <ClientForm
+          onSubmit={handleSubmit}
+          isSubmitting={createClient.isPending}
         />
       </SheetContent>
     </Sheet>

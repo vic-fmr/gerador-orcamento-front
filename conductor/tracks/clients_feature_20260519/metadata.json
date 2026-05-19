@@ -1,8 +1,0 @@
-{
-  "track_id": "clients_feature_20260519",
-  "type": "feature",
-  "status": "new",
-  "created_at": "2026-05-19T13:10:00Z",
-  "updated_at": "2026-05-19T13:10:00Z",
-  "description": "Add clients page and new client feature, client json: name, email, phone, address, addressName. backend will handle id"
-}
