@@ -1,7 +1,7 @@
 # Implementation Plan: Clients Feature
 
 ## Phase 1: Data Layer & State Management
-- [ ] Task: Update Client Store and Types
+- [x] Task: Update Client Store and Types 58ab483
     - [ ] Update `src/store/useClientStore.ts` interface to match the new schema (`name`, `email`, `phone`, `address`, `addressName`).
     - [ ] Update mock data to reflect the new structure.
 - [ ] Task: Create Client API Hooks
