@@ -2,13 +2,14 @@
 
 import React, { useState } from 'react'
 import { useEstimates } from '@/hooks/useEstimates'
-import { Search, Filter, ArrowUpDown, FileText, Download, Eye } from 'lucide-react'
+import { Search, Filter, ArrowUpDown, FileText, Download, Eye, Calendar, User, DollarSign } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { generateEstimatePDF } from '@/lib/pdf-export'
 import { EstimatePreview } from '@/components/estimates/EstimatePreview'
 import { Estimate } from '@/store/useEstimateStore'
+import { cn } from '@/lib/utils'
 
 export default function EstimatesHistory() {
   const { data: estimates = [], isLoading } = useEstimates()
@@ -22,6 +23,18 @@ export default function EstimatesHistory() {
     const matchesStatus = statusFilter === 'all' || e.status === statusFilter
     return matchesSearch && matchesStatus
   })
+
+  const StatusBadge = ({ status }: { status: Estimate['status'] }) => (
+    <span className={cn(
+      "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase",
+      status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+      status === 'approved' ? 'bg-green-100 text-green-700' :
+      'bg-blue-100 text-blue-700'
+    )}>
+      {status === 'pending' ? 'Pendente' : 
+       status === 'approved' ? 'Aprovado' : 'Pago'}
+    </span>
+  )
 
   return (
     <div className="space-y-6">
@@ -65,7 +78,8 @@ export default function EstimatesHistory() {
         </div>
       </div>
 
-      <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+      {/* Desktop Table View */}
+      <div className="hidden md:block bg-card rounded-xl border border-border shadow-sm overflow-hidden">
         {isLoading ? (
           <div className="p-8 space-y-4">
             {[1, 2, 3].map((i) => (
@@ -99,14 +113,7 @@ export default function EstimatesHistory() {
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(estimate.amount)}
                   </td>
                   <td className="p-4 text-center">
-                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                       estimate.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                       estimate.status === 'approved' ? 'bg-green-100 text-green-700' :
-                       'bg-blue-100 text-blue-700'
-                     }`}>
-                       {estimate.status === 'pending' ? 'Pendente' : 
-                        estimate.status === 'approved' ? 'Aprovado' : 'Pago'}
-                     </span>
+                     <StatusBadge status={estimate.status} />
                   </td>
                   <td className="p-4 text-right">
                     <div className="flex justify-end gap-2">
@@ -138,6 +145,74 @@ export default function EstimatesHistory() {
               ))}
             </tbody>
           </table>
+        )}
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4">
+        {isLoading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-40 w-full animate-pulse bg-muted rounded-xl border border-border" />
+            ))}
+          </div>
+        ) : filteredEstimates.length === 0 ? (
+          <div className="p-12 text-center text-muted-foreground bg-card rounded-xl border border-border">
+            Nenhum orçamento encontrado.
+          </div>
+        ) : (
+          filteredEstimates.map((estimate) => (
+            <div key={estimate.id} className="bg-card rounded-xl border border-border shadow-sm p-4 space-y-4">
+              <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                  <h3 className="font-bold text-base leading-tight">{estimate.title}</h3>
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Calendar className="h-3 w-3" />
+                    {new Date(estimate.date).toLocaleDateString('pt-BR')}
+                  </div>
+                </div>
+                <StatusBadge status={estimate.status} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 pt-2">
+                <div className="space-y-1">
+                   <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                     <User className="h-3 w-3" />
+                     Cliente
+                   </div>
+                   <p className="text-sm font-medium">{estimate.client}</p>
+                </div>
+                <div className="space-y-1">
+                   <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                     <DollarSign className="h-3 w-3" />
+                     Valor
+                   </div>
+                   <p className="text-sm font-bold text-primary">
+                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(estimate.amount)}
+                   </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pt-2 border-t border-border">
+                <Button 
+                  variant="outline" 
+                  className="flex-1 h-9 gap-2" 
+                  onClick={() => setSelectedPreview(estimate)}
+                >
+                  <Eye className="h-4 w-4" />
+                  Ver Prévia
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex-1 h-9 gap-2 text-primary hover:bg-primary/5"
+                  onClick={() => generateEstimatePDF(estimate)}
+                >
+                  <Download className="h-4 w-4" />
+                  PDF
+                </Button>
+              </div>
+            </div>
+          ))
         )}
       </div>
 

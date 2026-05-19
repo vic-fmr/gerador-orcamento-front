@@ -33,31 +33,31 @@ describe('EstimatesHistory Page', () => {
   test('renders list of estimates', async () => {
     render(<EstimatesHistory />, { wrapper })
     
-    expect(await screen.findByText(/Reforma Cozinha/i)).toBeInTheDocument()
-    expect(screen.getByText(/Pintura Sala/i)).toBeInTheDocument()
+    expect((await screen.findAllByText(/Reforma Cozinha/i)).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/Pintura Sala/i).length).toBeGreaterThan(0)
   })
 
   test('filters by search term', async () => {
     render(<EstimatesHistory />, { wrapper })
     
-    expect(await screen.findByText(/Reforma Cozinha/i)).toBeInTheDocument()
+    expect((await screen.findAllByText(/Reforma Cozinha/i)).length).toBeGreaterThan(0)
     
     const searchInput = screen.getByPlaceholderText(/procurar orçamentos/i)
     fireEvent.change(searchInput, { target: { value: 'Cozinha' } })
     
-    expect(screen.getByText(/Reforma Cozinha/i)).toBeInTheDocument()
+    expect(screen.getAllByText(/Reforma Cozinha/i).length).toBeGreaterThan(0)
     expect(screen.queryByText(/Pintura Sala/i)).not.toBeInTheDocument()
   })
 
   test('filters by status', async () => {
     render(<EstimatesHistory />, { wrapper })
     
-    expect(await screen.findByText(/Pintura Sala/i)).toBeInTheDocument()
+    expect((await screen.findAllByText(/Pintura Sala/i)).length).toBeGreaterThan(0)
     
     const statusSelect = screen.getByLabelText(/status/i)
     fireEvent.change(statusSelect, { target: { value: 'approved' } })
     
-    expect(screen.getByText(/Pintura Sala/i)).toBeInTheDocument()
+    expect(screen.getAllByText(/Pintura Sala/i).length).toBeGreaterThan(0)
     expect(screen.queryByText(/Reforma Cozinha/i)).not.toBeInTheDocument()
   })
 })

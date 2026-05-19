@@ -256,14 +256,14 @@ export default function NewEstimatePage() {
           </div>
         )}
 
-        <div className="flex justify-between gap-4 pt-4 border-t border-border">
+        <div className="flex flex-col-reverse sm:flex-row justify-between gap-4 pt-4 border-t border-border">
           <div className="flex gap-4">
             {step > 1 ? (
-              <Button variant="outline" type="button" onClick={prevStep}>
+              <Button variant="outline" type="button" onClick={prevStep} className="flex-1 sm:flex-initial h-11 sm:h-9">
                 Anterior
               </Button>
             ) : (
-              <Button variant="outline" type="button" onClick={() => router.push('/')}>
+              <Button variant="outline" type="button" onClick={() => router.push('/')} className="flex-1 sm:flex-initial h-11 sm:h-9">
                 Cancelar
               </Button>
             )}
@@ -271,11 +271,11 @@ export default function NewEstimatePage() {
           
           <div className="flex gap-4">
             {step < 3 ? (
-              <Button type="button" onClick={nextStep} className="bg-primary hover:bg-primary/90">
+              <Button type="button" onClick={nextStep} className="bg-primary hover:bg-primary/90 flex-1 sm:flex-initial h-11 sm:h-9">
                 Próximo
               </Button>
             ) : (
-              <Button type="submit" disabled={createEstimate.isPending} className="bg-primary hover:bg-primary/90">
+              <Button type="submit" disabled={createEstimate.isPending} className="bg-primary hover:bg-primary/90 flex-1 sm:flex-initial h-11 sm:h-9">
                 <Save className="mr-2 h-4 w-4" />
                 Salvar Orçamento
               </Button>
