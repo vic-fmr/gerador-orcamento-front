@@ -5,16 +5,17 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { ArrowLeft, Save } from 'lucide-react'
+import { ArrowLeft, Save, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useEstimateStore, LineItem } from '@/store/useEstimateStore'
+import { useEstimateStore, LineItem, Estimate } from '@/store/useEstimateStore'
 import Link from 'next/link'
 import { LineItemsEditor } from '@/components/estimates/LineItemsEditor'
 import { Controller } from 'react-hook-form'
 import { useCreateEstimate } from '@/hooks/useEstimates'
 import { ClientSelect } from '@/components/estimates/ClientSelect'
+import { EstimatePreview } from '@/components/estimates/EstimatePreview'
 
 const estimateSchema = z.object({
   title: z.string().min(3, 'O título deve ter pelo menos 3 caracteres'),
@@ -33,6 +34,7 @@ type EstimateFormValues = z.infer<typeof estimateSchema>
 export default function NewEstimatePage() {
   const router = useRouter()
   const [step, setStep] = React.useState(1)
+  const [isPreviewOpen, setIsPreviewOpen] = React.useState(false)
   const createEstimate = useCreateEstimate()
 
   const {
@@ -55,6 +57,11 @@ export default function NewEstimatePage() {
   const clientName = watch('client')
 
   const onSubmit = (data: EstimateFormValues) => {
+    if (step < 3) {
+      nextStep()
+      return
+    }
+
     const totalAmount = data.items.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0)
     
     const newEstimate = {
@@ -87,6 +94,16 @@ export default function NewEstimatePage() {
   }
 
   const totalAmount = items.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0)
+
+  const currentEstimateForPreview: Estimate = {
+    id: 'draft',
+    title,
+    client: clientName,
+    amount: totalAmount,
+    status: 'pending' as const,
+    date: new Date().toISOString(),
+    items: items,
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -174,6 +191,19 @@ export default function NewEstimatePage() {
 
         {step === 3 && (
           <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
+            <div className="flex items-center justify-between">
+               <h3 className="text-lg font-semibold">Resumo do Orçamento</h3>
+               <Button 
+                 type="button" 
+                 variant="outline" 
+                 size="sm"
+                 onClick={() => setIsPreviewOpen(true)}
+               >
+                 <Eye className="mr-2 h-4 w-4" />
+                 Ver Prévia do Documento
+               </Button>
+            </div>
+            
             <div className="grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg">
               <div>
                 <Label className="text-muted-foreground">Projeto</Label>
@@ -253,6 +283,13 @@ export default function NewEstimatePage() {
           </div>
         </div>
       </form>
+
+      {isPreviewOpen && (
+        <EstimatePreview 
+          estimate={currentEstimateForPreview} 
+          onClose={() => setIsPreviewOpen(false)} 
+        />
+      )}
     </div>
   )
 }

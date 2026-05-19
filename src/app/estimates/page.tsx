@@ -2,16 +2,19 @@
 
 import React, { useState } from 'react'
 import { useEstimates } from '@/hooks/useEstimates'
-import { Search, Filter, ArrowUpDown, FileText, Download } from 'lucide-react'
+import { Search, Filter, ArrowUpDown, FileText, Download, Eye } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { generateEstimatePDF } from '@/lib/pdf-export'
+import { EstimatePreview } from '@/components/estimates/EstimatePreview'
+import { Estimate } from '@/store/useEstimateStore'
 
 export default function EstimatesHistory() {
   const { data: estimates = [], isLoading } = useEstimates()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [selectedPreview, setSelectedPreview] = useState<Estimate | null>(null)
 
   const filteredEstimates = estimates.filter((e) => {
     const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -111,6 +114,15 @@ export default function EstimatesHistory() {
                         variant="ghost" 
                         size="sm" 
                         type="button"
+                        onClick={() => setSelectedPreview(estimate)}
+                        title="Ver Prévia"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        type="button"
                         onClick={() => generateEstimatePDF(estimate)}
                         title="Download PDF"
                         className="text-primary hover:text-primary hover:bg-primary/10"
@@ -128,6 +140,13 @@ export default function EstimatesHistory() {
           </table>
         )}
       </div>
+
+      {selectedPreview && (
+        <EstimatePreview 
+          estimate={selectedPreview} 
+          onClose={() => setSelectedPreview(null)} 
+        />
+      )}
     </div>
   )
 }
