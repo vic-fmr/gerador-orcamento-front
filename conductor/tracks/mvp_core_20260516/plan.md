@@ -24,3 +24,6 @@
 - [x] Task: Integrate docx library for editable DOCX export (b980d85)
 - [x] Task: Final responsive polish for mobile field work (2b9bda1)
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Document Export & History' (Protocol in workflow.md) (b980d85)
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions (2e4a073)
