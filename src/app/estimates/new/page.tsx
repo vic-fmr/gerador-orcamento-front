@@ -9,10 +9,10 @@ import { ArrowLeft, Save, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useEstimateStore, LineItem, Estimate } from '@/store/useEstimateStore'
+import { Estimate } from '@/store/useEstimateStore'
 import Link from 'next/link'
 import { LineItemsEditor } from '@/components/estimates/LineItemsEditor'
-import { Controller } from 'react-hook-form'
+import { Controller, Path } from 'react-hook-form'
 import { useCreateEstimate } from '@/hooks/useEstimates'
 import { ClientSelect } from '@/components/estimates/ClientSelect'
 import { EstimatePreview } from '@/components/estimates/EstimatePreview'
@@ -65,7 +65,7 @@ export default function NewEstimatePage() {
     const totalAmount = data.items.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0)
     
     const newEstimate = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: crypto.randomUUID(),
       title: data.title,
       client: data.client,
       amount: totalAmount,
@@ -83,8 +83,8 @@ export default function NewEstimatePage() {
 
   const nextStep = async (e?: React.MouseEvent) => {
     if (e) e.preventDefault()
-    const fieldsToValidate = step === 1 ? ['title', 'client'] : ['items']
-    const result = await trigger(fieldsToValidate as any)
+    const fieldsToValidate: Path<EstimateFormValues>[] = step === 1 ? ['title', 'client'] : ['items']
+    const result = await trigger(fieldsToValidate)
     if (result) setStep(step + 1)
   }
 

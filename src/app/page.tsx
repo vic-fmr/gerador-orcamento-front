@@ -21,6 +21,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { useEstimates } from '@/hooks/useEstimates'
 import { useEstimateStore } from '@/store/useEstimateStore'
+import { cn } from '@/lib/utils'
 
 export default function Home() {
   const { data: estimates = [], isLoading } = useEstimates()
@@ -170,8 +171,5 @@ export default function Home() {
       </div>
     </div>
   )
-}
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(' ')
 }
 

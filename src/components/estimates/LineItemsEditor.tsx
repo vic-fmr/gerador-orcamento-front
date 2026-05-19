@@ -17,7 +17,7 @@ export function LineItemsEditor({ items, onChange }: LineItemsEditorProps) {
 
   const addItemFromCatalog = (catalogItem: CatalogItem) => {
     const newItem: LineItem = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: crypto.randomUUID(),
       description: catalogItem.description,
       quantity: 1,
       unitPrice: catalogItem.defaultUnitPrice,

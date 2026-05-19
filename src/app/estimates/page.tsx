@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useEstimates } from '@/hooks/useEstimates'
-import { Search, Filter, ArrowUpDown, FileText, Download, Eye, Calendar, User, DollarSign, FileEdit } from 'lucide-react'
+import { Search, ArrowUpDown, Download, Eye, Calendar, User, DollarSign, FileEdit } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'

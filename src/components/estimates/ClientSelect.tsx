@@ -60,11 +60,11 @@ export function ClientSelect({ value, onChange, id }: ClientSelectProps) {
             <input
               className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground"
               placeholder="Procurar cliente..."
+              aria-label="Procurar cliente"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}    
               autoFocus
-            />
-          </div>
+            />          </div>
           <div className="max-h-[300px] overflow-y-auto p-1">
             {filteredClients.length === 0 ? (
               <div className="py-6 text-center text-sm text-muted-foreground">
