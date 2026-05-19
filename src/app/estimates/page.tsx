@@ -2,10 +2,11 @@
 
 import React, { useState } from 'react'
 import { useEstimates } from '@/hooks/useEstimates'
-import { Search, Filter, ArrowUpDown, FileText } from 'lucide-react'
+import { Search, Filter, ArrowUpDown, FileText, Download } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { generateEstimatePDF } from '@/lib/pdf-export'
 
 export default function EstimatesHistory() {
   const { data: estimates = [], isLoading } = useEstimates()
@@ -105,9 +106,21 @@ export default function EstimatesHistory() {
                      </span>
                   </td>
                   <td className="p-4 text-right">
-                    <Button variant="ghost" size="sm" type="button">
-                      <FileText className="h-4 w-4" />
-                    </Button>
+                    <div className="flex justify-end gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        type="button"
+                        onClick={() => generateEstimatePDF(estimate)}
+                        title="Download PDF"
+                        className="text-primary hover:text-primary hover:bg-primary/10"
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" type="button">
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
