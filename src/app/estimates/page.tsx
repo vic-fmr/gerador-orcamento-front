@@ -2,11 +2,12 @@
 
 import React, { useState } from 'react'
 import { useEstimates } from '@/hooks/useEstimates'
-import { Search, Filter, ArrowUpDown, FileText, Download, Eye, Calendar, User, DollarSign } from 'lucide-react'
+import { Search, Filter, ArrowUpDown, FileText, Download, Eye, Calendar, User, DollarSign, FileEdit } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { generateEstimatePDF } from '@/lib/pdf-export'
+import { generateEstimateDOCX } from '@/lib/docx-export'
 import { EstimatePreview } from '@/components/estimates/EstimatePreview'
 import { Estimate } from '@/store/useEstimateStore'
 import { cn } from '@/lib/utils'
@@ -130,14 +131,21 @@ export default function EstimatesHistory() {
                         variant="ghost" 
                         size="sm" 
                         type="button"
+                        onClick={() => generateEstimateDOCX(estimate)}
+                        title="Download DOCX"
+                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                      >
+                        <FileEdit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        type="button"
                         onClick={() => generateEstimatePDF(estimate)}
                         title="Download PDF"
                         className="text-primary hover:text-primary hover:bg-primary/10"
                       >
                         <Download className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" type="button">
-                        <FileText className="h-4 w-4" />
                       </Button>
                     </div>
                   </td>
@@ -193,9 +201,10 @@ export default function EstimatesHistory() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 pt-2 border-t border-border">
+              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border">
                 <Button 
                   variant="outline" 
+                  size="sm"
                   className="flex-1 h-9 gap-2" 
                   onClick={() => setSelectedPreview(estimate)}
                 >
@@ -204,6 +213,16 @@ export default function EstimatesHistory() {
                 </Button>
                 <Button 
                   variant="outline" 
+                  size="sm"
+                  className="flex-1 h-9 gap-2 text-blue-600 hover:bg-blue-50"
+                  onClick={() => generateEstimateDOCX(estimate)}
+                >
+                  <FileEdit className="h-4 w-4" />
+                  DOCX
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
                   className="flex-1 h-9 gap-2 text-primary hover:bg-primary/5"
                   onClick={() => generateEstimatePDF(estimate)}
                 >

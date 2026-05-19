@@ -1,8 +1,9 @@
 import React from 'react'
 import { Estimate } from '@/store/useEstimateStore'
 import { Button } from '@/components/ui/button'
-import { X, Download } from 'lucide-react'
+import { X, Download, FileEdit } from 'lucide-react'
 import { generateEstimatePDF } from '@/lib/pdf-export'
+import { generateEstimateDOCX } from '@/lib/docx-export'
 
 interface EstimatePreviewProps {
   estimate: Estimate
@@ -25,9 +26,13 @@ export function EstimatePreview({ estimate, onClose }: EstimatePreviewProps) {
         <div className="sticky top-0 bg-background border-b border-border p-4 flex items-center justify-between z-10 shrink-0">
           <h3 className="text-xl font-bold">Visualização do Orçamento</h3>
           <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => generateEstimateDOCX(estimate)} className="hidden sm:flex">
+              <FileEdit className="mr-2 h-4 w-4" />
+              DOCX
+            </Button>
             <Button variant="outline" size="sm" onClick={() => generateEstimatePDF(estimate)}>
               <Download className="mr-2 h-4 w-4" />
-              Download PDF
+              PDF
             </Button>
             <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full">
               <X className="h-5 w-5" />
