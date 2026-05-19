@@ -21,6 +21,10 @@ To provide a modern, vibrant web frontend for service-based professionals (const
 - **Financial Oversight:** Provide a clear dashboard view of estimate statuses and financial health.
 
 ## Core Features
-- **Modern Dashboard:** A vibrant, intuitive admin panel to manage all business estimates.
-- **Document Export:** Seamless generation of professional PDF and DOCX documents for client distribution.
-- **Estimate Management:** Create, edit, and track the lifecycle of project budgets.
+- **Modern Dashboard:** A vibrant, intuitive admin panel to manage all business estimates with real-time status tracking.
+- **Wizard-based Creation:** A guided 3-step process (Details, Items, Review) for error-free estimate generation.
+- **Catalog Integration:** Rapidly add service and material items from a pre-registered catalog with predefined units (m, kg, un, etc.) and prices.
+- **Client Management:** Maintain a searchable database of clients for quick selection during estimate creation.
+- **High-Fidelity Preview:** Visualize documents exactly as they will appear to the client before finalizing.
+- **Document Export:** Seamless generation of professional, branded PDF and editable DOCX documents.
+- **Estimate History:** Comprehensive, searchable list of all past budgets with status filtering.
