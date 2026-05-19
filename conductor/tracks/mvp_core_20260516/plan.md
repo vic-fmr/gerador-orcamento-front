@@ -21,5 +21,6 @@
 - [x] Task: Implement Estimate History list with search and filtering (fa593f6)
 - [x] Task: Integrate jspdf for basic branded PDF export (9621b53)
 - [x] Task: Implement Document Preview before download (22f7d16)
+- [x] Task: Integrate docx library for editable DOCX export (b980d85)
 - [x] Task: Final responsive polish for mobile field work (2b9bda1)
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Document Export & History' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Document Export & History' (Protocol in workflow.md) (b980d85)
