@@ -2,6 +2,13 @@ import { create } from 'zustand'
 
 export type EstimateStatus = 'pending' | 'approved' | 'paid'
 
+export interface LineItem {
+  id: string
+  description: string
+  quantity: number
+  unitPrice: number
+}
+
 export interface Estimate {
   id: string
   title: string
@@ -9,6 +16,7 @@ export interface Estimate {
   amount: number
   status: EstimateStatus
   date: string
+  items: LineItem[]
 }
 
 interface EstimateState {
@@ -32,6 +40,7 @@ export const useEstimateStore = create<EstimateState>((set, get) => ({
       amount: 5200,
       status: 'pending',
       date: new Date().toISOString(),
+      items: [],
     },
     {
       id: '2',
@@ -40,6 +49,7 @@ export const useEstimateStore = create<EstimateState>((set, get) => ({
       amount: 2400,
       status: 'approved',
       date: new Date().toISOString(),
+      items: [],
     },
     {
       id: '3',
@@ -48,6 +58,7 @@ export const useEstimateStore = create<EstimateState>((set, get) => ({
       amount: 7800,
       status: 'paid',
       date: new Date().toISOString(),
+      items: [],
     }
   ],
   addEstimate: (estimate) => set((state) => ({ 

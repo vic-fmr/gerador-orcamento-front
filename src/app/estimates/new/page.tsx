@@ -9,12 +9,20 @@ import { ArrowLeft, Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useEstimateStore } from '@/store/useEstimateStore'
+import { useEstimateStore, LineItem } from '@/store/useEstimateStore'
 import Link from 'next/link'
+import { LineItemsEditor } from '@/components/estimates/LineItemsEditor'
+import { Controller } from 'react-hook-form'
 
 const estimateSchema = z.object({
   title: z.string().min(3, 'O título deve ter pelo menos 3 caracteres'),
   client: z.string().min(2, 'O nome do cliente é obrigatório'),
+  items: z.array(z.object({
+    id: z.string(),
+    description: z.string().min(1, 'Descrição é obrigatória'),
+    quantity: z.number().min(1),
+    unitPrice: z.number().min(0),
+  })).min(1, 'Adicione pelo menos um item'),
 })
 
 type EstimateFormValues = z.infer<typeof estimateSchema>
@@ -26,19 +34,30 @@ export default function NewEstimatePage() {
   const {
     register,
     handleSubmit,
+    control,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<EstimateFormValues>({
     resolver: zodResolver(estimateSchema),
+    defaultValues: {
+      items: [],
+    },
   })
 
+  const items = watch('items')
+
   const onSubmit = (data: EstimateFormValues) => {
+    const totalAmount = data.items.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0)
+    
     const newEstimate = {
       id: Math.random().toString(36).substr(2, 9),
       title: data.title,
       client: data.client,
-      amount: 0, // Will be updated in next task
+      amount: totalAmount,
       status: 'pending' as const,
       date: new Date().toISOString(),
+      items: data.items,
     }
     
     addEstimate(newEstimate)
@@ -46,7 +65,7 @@ export default function NewEstimatePage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-4">
         <Link 
           href="/" 
@@ -59,7 +78,7 @@ export default function NewEstimatePage() {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 bg-card p-6 rounded-xl shadow-sm border border-border">
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label htmlFor="title">Título do Projeto</Label>
             <Input
@@ -83,6 +102,22 @@ export default function NewEstimatePage() {
               <p className="text-sm font-medium text-destructive">{errors.client.message}</p>
             )}
           </div>
+        </div>
+
+        <div className="space-y-4">
+          <Controller
+            control={control}
+            name="items"
+            render={({ field }) => (
+              <LineItemsEditor
+                items={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
+          {errors.items && (
+            <p className="text-sm font-medium text-destructive">{errors.items.message}</p>
+          )}
         </div>
 
         <div className="flex justify-end gap-4">
