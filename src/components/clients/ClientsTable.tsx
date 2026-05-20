@@ -8,6 +8,47 @@ interface ClientsTableProps {
   clients: Client[]
 }
 
+const ClientRow = React.memo(function ClientRow({ client }: { client: Client }) {
+  return (
+    <tr key={client.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+      <td className="p-4">
+        <div className="font-medium text-sm">{client.name}</div>
+        <div className="text-xs text-muted-foreground">ID: {client.id.slice(0, 8)}</div>
+      </td>
+      <td className="p-4">
+        <div className="flex flex-col gap-0.5">
+          <div className="text-sm flex items-center gap-1.5">
+            <Mail className="h-3 w-3 text-muted-foreground" />
+            {client.email || 'N/A'}
+          </div>
+          <div className="text-xs text-muted-foreground flex items-center gap-1.5">
+            <Phone className="h-3 w-3" />
+            {client.phone || 'N/A'}
+          </div>
+        </div>
+      </td>
+      <td className="p-4 text-sm">
+        {client.address ? (
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1.5">
+              <MapPin className="h-3 w-3 text-muted-foreground" />
+              <span>{client.address}</span>
+            </div>
+            {client.addressName && (
+              <span className="text-xs text-muted-foreground ml-4.5">{client.addressName}</span>
+            )}
+          </div>
+        ) : (
+          <span className="text-muted-foreground italic">Sem endereço</span>
+        )}
+      </td>
+      <td className="p-4 text-right">
+        <span className="text-xs text-muted-foreground italic">Visualizar</span>
+      </td>
+    </tr>
+  )
+})
+
 export function ClientsTable({ clients }: ClientsTableProps) {
   if (clients.length === 0) {
     return (
@@ -32,43 +73,7 @@ export function ClientsTable({ clients }: ClientsTableProps) {
           </thead>
           <tbody>
             {clients.map((client) => (
-              <tr key={client.id} className="border-b border-border hover:bg-muted/30 transition-colors">
-                <td className="p-4">
-                  <div className="font-medium text-sm">{client.name}</div>
-                  <div className="text-xs text-muted-foreground">ID: {client.id.slice(0, 8)}</div>
-                </td>
-                <td className="p-4">
-                  <div className="flex flex-col gap-0.5">
-                    <div className="text-sm flex items-center gap-1.5">
-                      <Mail className="h-3 w-3 text-muted-foreground" />
-                      {client.email || 'N/A'}
-                    </div>
-                    <div className="text-xs text-muted-foreground flex items-center gap-1.5">
-                      <Phone className="h-3 w-3" />
-                      {client.phone || 'N/A'}
-                    </div>
-                  </div>
-                </td>
-                <td className="p-4 text-sm">
-                  {client.address ? (
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-1.5">
-                        <MapPin className="h-3 w-3 text-muted-foreground" />
-                        <span>{client.address}</span>
-                      </div>
-                      {client.addressName && (
-                        <span className="text-xs text-muted-foreground ml-4.5">{client.addressName}</span>
-                      )}
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground italic">Sem endereço</span>
-                  )}
-                </td>
-                <td className="p-4 text-right">
-                  {/* Actions can be added here in the future */}
-                  <span className="text-xs text-muted-foreground italic">Visualizar</span>
-                </td>
-              </tr>
+              <ClientRow key={client.id} client={client} />
             ))}
           </tbody>
         </table>

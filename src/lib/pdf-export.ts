@@ -1,11 +1,14 @@
 import jsPDF from 'jspdf'
 import { Estimate } from '@/store/useEstimateStore'
+import { COMPANY_INFO, DOCUMENT_PRIMARY_COLOR_RGB, EstimateClientInfo, formatAddress, formatCnpj } from '@/lib/estimate-document'
 
-const PRIMARY_COLOR = [0, 102, 153] // Blue from screenshots
+const PRIMARY_COLOR = DOCUMENT_PRIMARY_COLOR_RGB
 
-export function generateEstimatePDF(estimate: Estimate) {
+export function generateEstimatePDF(estimate: Estimate, clientInfo?: EstimateClientInfo) {
   const doc = new jsPDF()
   const pageWidth = doc.internal.pageSize.getWidth()
+  const selectedClient = clientInfo ?? { name: estimate.client }
+  const address = formatAddress(selectedClient)
 
   // Header Bar
   doc.setFillColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2])
@@ -18,12 +21,12 @@ export function generateEstimatePDF(estimate: Estimate) {
   // Company Info
   doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2])
   doc.setFontSize(16)
-  doc.text('Gesso e Pintura', 195, 22, { align: 'right' })
+  doc.text(COMPANY_INFO.name, 195, 22, { align: 'right' })
   doc.setTextColor(100)
   doc.setFontSize(10)
   doc.setFont('helvetica', 'normal')
-  doc.text('CNPJ: 00.000.000/0001-00', 195, 28, { align: 'right' })
-  doc.text('Telefone: (00) 00000-0000', 195, 33, { align: 'right' })
+  doc.text(`CNPJ: ${formatCnpj(COMPANY_INFO.cnpj)}`, 195, 28, { align: 'right' })
+  doc.text(COMPANY_INFO.engineer, 195, 33, { align: 'right' })
 
   // Client Info Box
   doc.setDrawColor(200)
@@ -36,12 +39,16 @@ export function generateEstimatePDF(estimate: Estimate) {
   doc.text('ENDEREÇO:', 20, 63)
   doc.text('DATA:', 110, 53)
   doc.text('VALIDADE:', 110, 63)
+  doc.text('EMAIL:', 150, 53)
+  doc.text('TELEFONE:', 150, 63)
 
   doc.setFont('helvetica', 'normal')
-  doc.text(estimate.client, 45, 53)
-  doc.text('Não informado', 45, 63)
+  doc.text(selectedClient.name, 45, 53)
+  doc.text(address, 45, 63)
   doc.text(new Date(estimate.date).toLocaleDateString('pt-BR'), 130, 53)
   doc.text('15 dias', 135, 63)
+  doc.text(selectedClient.email || 'Não informado', 165, 53)
+  doc.text(selectedClient.phone || 'Não informado', 165, 63)
 
   // Table Header
   doc.setFillColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2])

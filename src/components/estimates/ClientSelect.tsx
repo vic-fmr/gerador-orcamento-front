@@ -15,8 +15,9 @@ export function ClientSelect({ value, onChange, id }: ClientSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const filteredClients = clients.filter((client) =>
-    client.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredClients = React.useMemo(
+    () => clients.filter((client) => client.name.toLowerCase().includes(searchTerm.toLowerCase())),
+    [clients, searchTerm]
   )
 
   const handleSelect = (clientName: string) => {
@@ -65,7 +66,7 @@ export function ClientSelect({ value, onChange, id }: ClientSelectProps) {
               onChange={(e) => setSearchTerm(e.target.value)}    
               autoFocus
             />          </div>
-          <div className="max-h-[300px] overflow-y-auto p-1">
+          <div className="max-h-[min(300px,50vh)] overflow-y-auto p-1">
             {filteredClients.length === 0 ? (
               <div className="py-6 text-center text-sm text-muted-foreground">
                 Nenhum cliente encontrado.

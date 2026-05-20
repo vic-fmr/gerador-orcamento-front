@@ -21,14 +21,9 @@ export default function ClientsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Clientes</h2>
-        </div>
-        <CreateClientSheet />
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-card p-4 rounded-xl border border-border shadow-sm">
+      
+      <div className="flex justify-between items-center gap-4 bg-card p-4 rounded-xl border border-border shadow-sm">
         <div className="md:col-span-2 space-y-1.5">
           <Label htmlFor="search">Procurar</Label>
           <div className="relative">
@@ -42,7 +37,9 @@ export default function ClientsPage() {
             />
           </div>
         </div>
+      <CreateClientSheet />
       </div>
+    
 
       {isLoading ? (
         <div className="flex justify-center p-12">

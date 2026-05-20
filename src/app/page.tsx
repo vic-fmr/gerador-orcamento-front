@@ -61,9 +61,6 @@ export default function Home() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Visão Geral</h2>
-          <p className="text-muted-foreground mt-1">
-            Bem-vindo de volta! Veja o que está acontecendo com seus orçamentos.
-          </p>
         </div>
         <Link
           href="/estimates/new"
@@ -77,18 +74,18 @@ export default function Home() {
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-3">
         {stats.map((stat) => (
-          <Card key={stat.name} className="overflow-hidden border-none shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.name}</CardTitle>
-              <div className={`${stat.bg} p-2 rounded-full`}>
-                <stat.icon className={`h-4 w-4 ${stat.color}`} />
+          <Card key={stat.name} className="overflow-hidden border-none shadow-sm">
+            <CardHeader className="flex items-start gap-3 pb-2">
+              <div className={`${stat.bg} p-2 rounded-md`}> 
+                <stat.icon className={`h-5 w-5 ${stat.color}`} />
+              </div>
+              <div className="flex-1">
+                <CardTitle className="text-sm font-medium">{stat.name}</CardTitle>
+                <p className="text-xs text-muted-foreground">{stat.count} orçamentos</p>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {stat.count} orçamentos no total
-              </p>
             </CardContent>
           </Card>
         ))}
