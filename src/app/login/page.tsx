@@ -49,7 +49,7 @@ export default function LoginPage() {
       id: '1',
       name: 'João Silva',
       email: data.email,
-    })
+    }, 'mock-bearer-token-123')
     
     setIsLoading(false)
     router.push('/')

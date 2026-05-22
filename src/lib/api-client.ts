@@ -5,6 +5,26 @@
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api'
 
+function getHeaders(): Record<string, string> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+
+  try {
+    const authStorage = localStorage.getItem('auth-storage')
+    if (authStorage) {
+      const { state } = JSON.parse(authStorage)
+      if (state?.token) {
+        headers['Authorization'] = `Bearer ${state.token}`
+      }
+    }
+  } catch (error) {
+    console.error('Error reading auth token from localStorage', error)
+  }
+
+  return headers
+}
+
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -39,9 +59,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 export async function apiGet<T>(path: string): Promise<T> {
   const response = await fetch(`${baseUrl}${path}`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getHeaders(),
   })
   return handleResponse<T>(response)
 }
@@ -49,9 +67,7 @@ export async function apiGet<T>(path: string): Promise<T> {
 export async function apiPost<T>(path: string, body: unknown): Promise<T> {
   const response = await fetch(`${baseUrl}${path}`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getHeaders(),
     body: JSON.stringify(body),
   })
   return handleResponse<T>(response)
@@ -60,9 +76,7 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
 export async function apiPut<T>(path: string, body: unknown): Promise<T> {
   const response = await fetch(`${baseUrl}${path}`, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getHeaders(),
     body: JSON.stringify(body),
   })
   return handleResponse<T>(response)
@@ -71,9 +85,7 @@ export async function apiPut<T>(path: string, body: unknown): Promise<T> {
 export async function apiDelete<T>(path: string): Promise<T> {
   const response = await fetch(`${baseUrl}${path}`, {
     method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getHeaders(),
   })
   return handleResponse<T>(response)
 }
