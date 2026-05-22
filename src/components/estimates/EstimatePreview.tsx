@@ -1,18 +1,20 @@
 import React from 'react'
-import { Estimate } from '@/store/useEstimateStore'
+import { Quote } from '@/store/useQuoteStore'
 import { Button } from '@/components/ui/button'
 import { X, Download, FileEdit } from 'lucide-react'
-import { generateEstimatePDF } from '@/lib/pdf-export'
-import { generateEstimateDOCX } from '../../lib/docx-export'
+import { generateQuotePDF } from '@/lib/pdf-export'
+import { generateQuoteDOCX } from '../../lib/docx-export'
 import { useClientStore } from '@/store/useClientStore'
 import { COMPANY_INFO, formatAddress, formatCnpj, resolveEstimateClient } from '@/lib/estimate-document'
+import { useClients } from '@/hooks/useClients'
 
-interface EstimatePreviewProps {
-  estimate: Estimate
+interface QuotePreviewProps {
+  estimate: Quote
   onClose: () => void
 }
 
-export function EstimatePreview({ estimate, onClose }: EstimatePreviewProps) {
+export function EstimatePreview({ estimate, onClose }: QuotePreviewProps) {
+  useClients()
   const clients = useClientStore((state) => state.clients)
 
   // Close on Escape key
@@ -38,11 +40,11 @@ export function EstimatePreview({ estimate, onClose }: EstimatePreviewProps) {
             <p className="text-xs sm:text-sm text-muted-foreground">Prévia adaptada para leitura no desktop e no mobile.</p>
           </div>
           <div className="flex items-center gap-2 self-end sm:self-auto">
-            <Button variant="outline" size="sm" onClick={() => generateEstimateDOCX(estimate, clientInfo)} className="hidden sm:flex">
+            <Button variant="outline" size="sm" onClick={() => generateQuoteDOCX(estimate, clientInfo)} className="hidden sm:flex">
               <FileEdit className="mr-2 h-4 w-4" />
               DOCX
             </Button>
-            <Button variant="outline" size="sm" onClick={() => generateEstimatePDF(estimate, clientInfo)}>
+            <Button variant="outline" size="sm" onClick={() => generateQuotePDF(estimate, clientInfo)}>
               <Download className="mr-2 h-4 w-4" />
               PDF
             </Button>
@@ -82,32 +84,32 @@ export function EstimatePreview({ estimate, onClose }: EstimatePreviewProps) {
           {/* Items Table */}
           <div className="border border-slate-200 rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-sm">
-              <thead className={`${PRIMARY_COLOR_CLASS} text-primary-foreground`}>
-                <tr>
-                  <th className="text-left p-3 font-bold">DESCRIÇÃO</th>
-                  <th className="text-center p-3 font-bold">UNID.</th>
-                  <th className="text-center p-3 font-bold">QUANT.</th>
-                  <th className="text-right p-3 font-bold">V. UNITÁRIO</th>
-                  <th className="text-right p-3 font-bold">V. TOTAL</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {estimate.items.map((item) => (
-                  <tr key={item.id}>
-                    <td className="p-3">{item.description}</td>
-                    <td className="p-3 text-center">{item.unit || 'un'}</td>
-                    <td className="p-3 text-center">{item.quantity}</td>
-                    <td className="p-3 text-right">
-                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.unitPrice)}
-                    </td>
-                    <td className="p-3 text-right font-bold">
-                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.quantity * item.unitPrice)}
-                    </td>
+              <table className="w-full min-w-[720px] text-sm">
+                <thead className={`${PRIMARY_COLOR_CLASS} text-primary-foreground`}>
+                  <tr>
+                    <th className="text-left p-3 font-bold">DESCRIÇÃO</th>
+                    <th className="text-center p-3 font-bold">UNID.</th>
+                    <th className="text-center p-3 font-bold">QUANT.</th>
+                    <th className="text-right p-3 font-bold">V. UNITÁRIO</th>
+                    <th className="text-right p-3 font-bold">V. TOTAL</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {estimate.items.map((item) => (
+                    <tr key={item.id}>
+                      <td className="p-3">{item.description}</td>
+                      <td className="p-3 text-center">{item.unit || 'un'}</td>
+                      <td className="p-3 text-center">{item.quantity}</td>
+                      <td className="p-3 text-right">
+                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.unitPrice)}
+                      </td>
+                      <td className="p-3 text-right font-bold">
+                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.quantity * item.unitPrice)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
 

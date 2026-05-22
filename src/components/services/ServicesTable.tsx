@@ -11,12 +11,12 @@ interface ServicesTableProps {
   onDelete: (service: ServiceItem) => void
 }
 
-const ServiceRow = React.memo(function ServiceRow({ service, onEdit, onDelete }: { service: ServiceItem, onEdit: (s: ServiceItem)=>void, onDelete: (s: ServiceItem)=>void }) {
+const ServiceRow = React.memo(function ServiceRow({ service, onEdit, onDelete }: { service: ServiceItem, onEdit: (s: ServiceItem) => void, onDelete: (s: ServiceItem) => void }) {
   return (
     <tr key={service.id} className="border-b border-border hover:bg-muted/30 transition-colors">
       <td className="p-4">
         <div className="font-medium text-sm">{service.name}</div>
-        <div className="text-xs text-muted-foreground">ID: {service.id.slice(0, 8)}</div>
+        <div className="text-xs text-muted-foreground">ID: {service.id}</div>
       </td>
       <td className="p-4 text-sm text-muted-foreground">{service.description || 'Sem descrição'}</td>
       <td className="p-4 text-sm">{service.unit}</td>
@@ -79,7 +79,7 @@ export function ServicesTable({ services, onEdit, onDelete }: ServicesTableProps
               <h3 className="font-bold text-base leading-tight">{service.name}</h3>
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <MapPin className="h-3 w-3" />
-                ID: {service.id.slice(0, 8)}
+                ID: {service.id}
               </div>
             </div>
 

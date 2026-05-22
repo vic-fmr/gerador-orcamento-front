@@ -34,10 +34,7 @@ export function ServiceSheet({ open, onOpenChange, service }: ServiceSheetProps)
     }
 
     createService.mutate(
-      {
-        id: crypto.randomUUID(),
-        ...data,
-      },
+      data,
       {
         onSuccess: () => onOpenChange(false),
       }

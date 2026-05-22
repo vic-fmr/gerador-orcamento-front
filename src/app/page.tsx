@@ -9,7 +9,8 @@ import {
   CreditCard,
   ArrowUpRight,
   TrendingUp,
-  FileText as LucideFileText
+  FileText as LucideFileText,
+  Trash2
 } from 'lucide-react'
 import {
   Card,
@@ -19,14 +20,27 @@ import {
   CardDescription
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { useEstimates } from '@/hooks/useEstimates'
-import { useEstimateStore } from '@/store/useEstimateStore'
+import { useQuotes, useDeleteQuote } from '@/hooks/useQuotes'
+import { useQuoteStore, Quote } from '@/store/useQuoteStore'
 import { cn } from '@/lib/utils'
+import { useClientStore } from '@/store/useClientStore'
+import { resolveEstimateClient } from '@/lib/estimate-document'
+import { useClients } from '@/hooks/useClients'
+import { getQuoteStatusBucket, getQuoteStatusLabel } from '@/lib/api'
 
 export default function Home() {
-  const { data: estimates = [], isLoading } = useEstimates()
-  const { getStats } = useEstimateStore()
+  const { data: quotes = [], isLoading } = useQuotes()
+  const deleteQuote = useDeleteQuote()
+  useClients()
+  const clients = useClientStore((state) => state.clients)
+  const { getStats } = useQuoteStore()
   const statsData = getStats()
+
+  const handleDelete = (quote: Quote) => {
+    if (window.confirm(`Tem certeza que deseja excluir o orçamento "${quote.title}"?`)) {
+      deleteQuote.mutate(quote.id)
+    }
+  }
 
   const stats = [
     {
@@ -63,7 +77,7 @@ export default function Home() {
           <h2 className="text-3xl font-bold tracking-tight">Visão Geral</h2>
         </div>
         <Link
-          href="/estimates/new"
+          href="/quotes/new"
           className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -76,7 +90,7 @@ export default function Home() {
         {stats.map((stat) => (
           <Card key={stat.name} className="overflow-hidden border-none shadow-sm">
             <CardHeader className="flex items-start gap-3 pb-2">
-              <div className={`${stat.bg} p-2 rounded-md`}> 
+              <div className={`${stat.bg} p-2 rounded-md`}>
                 <stat.icon className={`h-5 w-5 ${stat.color}`} />
               </div>
               <div className="flex-1">
@@ -110,33 +124,49 @@ export default function Home() {
                 </div>
               ) : (
                 <>
-                  {estimates.slice(0, 5).map((estimate) => (
-                    <div key={estimate.id} className="flex items-center justify-between p-3 bg-card rounded-lg border border-border/50">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded bg-primary/10 flex items-center justify-center">
-                          <LucideFileText className="w-5 h-5 text-primary" />
+                  {quotes.slice(0, 5).map((quote) => (
+                    (() => {
+                      const clientInfo = resolveEstimateClient(quote.client, clients)
+
+                      return (
+                        <div key={quote.id} className="flex items-center justify-between p-3 bg-card rounded-lg border border-border/50">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded bg-primary/10 flex items-center justify-center">
+                              <LucideFileText className="w-5 h-5 text-primary" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-sm">{quote.title}</p>
+                              <p className="text-xs text-muted-foreground">Cliente: {clientInfo.name}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="text-right">
+                              <p className="text-sm font-semibold">
+                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(quote.amount)}
+                              </p>
+                              <p className={cn(
+                                "text-[10px] font-medium px-1.5 py-0.5 rounded-full inline-block capitalize",
+                                getQuoteStatusBucket(quote.status) === 'pending' && "text-yellow-600 bg-yellow-100",
+                                getQuoteStatusBucket(quote.status) === 'approved' && "text-green-600 bg-green-100",
+                                getQuoteStatusBucket(quote.status) === 'paid' && "text-blue-600 bg-blue-100"
+                              )}>
+                                {getQuoteStatusLabel(quote.status)}
+                              </p>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-red-600 hover:bg-red-50"
+                              onClick={() => handleDelete(quote)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium text-sm">{estimate.title}</p>
-                          <p className="text-xs text-muted-foreground">Cliente: {estimate.client}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-semibold">
-                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(estimate.amount)}
-                        </p>
-                        <p className={cn(
-                          "text-[10px] font-medium px-1.5 py-0.5 rounded-full inline-block capitalize",
-                          estimate.status === 'pending' && "text-yellow-600 bg-yellow-100",
-                          estimate.status === 'approved' && "text-green-600 bg-green-100",
-                          estimate.status === 'paid' && "text-blue-600 bg-blue-100"
-                        )}>
-                          {estimate.status === 'pending' ? 'pendente' : estimate.status === 'approved' ? 'aprovado' : 'pago'}
-                        </p>
-                      </div>
-                    </div>
+                      )
+                    })()
                   ))}
-                  {estimates.length === 0 && (
+                  {quotes.length === 0 && (
                     <div className="text-center py-8 text-muted-foreground">
                       Nenhum orçamento encontrado. Crie o seu primeiro!
                     </div>
@@ -171,4 +201,5 @@ export default function Home() {
     </div>
   )
 }
+
 

@@ -3,17 +3,19 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Users, 
+import { useAuthStore } from '@/store/useAuthStore'
+import {
+  LayoutDashboard,
+  FileText,
+  Users,
   Wrench,
-  Settings, 
+  Settings,
   Menu,
   Bell,
   User,
   Moon,
-  Sun
+  Sun,
+  LogOut
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -26,16 +28,30 @@ import {
 
 const navItems = [
   { name: 'Painel', href: '/', icon: LayoutDashboard },
-  { name: 'Orçamentos', href: '/estimates', icon: FileText },
+  { name: 'Orçamentos', href: '/quotes', icon: FileText },
   { name: 'Clientes', href: '/clients', icon: Users },
   { name: 'Serviços', href: '/services', icon: Wrench },
 ]
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = React.useRef(require('next/navigation').useRouter()).current
+  const { user, isAuthenticated, logout } = useAuthStore()
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true)
   const [isMobileNavOpen, setIsMobileNavOpen] = React.useState(false)
   const [theme, setTheme] = React.useState<'light' | 'dark'>('light')
+
+  React.useEffect(() => {
+    // Basic auth check
+    if (!isAuthenticated && pathname !== '/login') {
+      router.push('/login')
+    }
+  }, [isAuthenticated, pathname, router])
+
+  const handleLogout = () => {
+    logout()
+    router.push('/login')
+  }
 
   React.useEffect(() => {
     try {
@@ -92,9 +108,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
     </>
   )
 
+  if (pathname === '/login') {
+    return <>{children}</>
+  }
+
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-      <aside 
+      <aside
         className={cn(
           "hidden md:flex bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300 ease-in-out z-20 p-2",
           isSidebarOpen ? "w-64" : "w-20"
@@ -123,7 +143,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
           {/* User Section / Bottom */}
           <div className="p-4 border-t border-sidebar-border">
-             <div className="flex items-center">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center overflow-hidden">
                 <div className="w-8 h-8 bg-sidebar-accent rounded-full flex items-center justify-center shrink-0">
                   <User className="w-4 h-4" />
                 </div>
@@ -131,10 +152,22 @@ export function Shell({ children }: { children: React.ReactNode }) {
                   "ml-3 overflow-hidden transition-opacity duration-300",
                   isSidebarOpen ? "opacity-100" : "opacity-0 w-0"
                 )}>
-                  <p className="text-sm font-medium leading-none">João Silva</p>
-                  <p className="text-xs text-sidebar-foreground/60 mt-1">Profissional</p>
+                  <p className="text-sm font-medium leading-none truncate">{user?.name || 'Usuário'}</p>
+                  <p className="text-xs text-sidebar-foreground/60 mt-1 truncate">{user?.email}</p>
                 </div>
-             </div>
+              </div>
+              {isSidebarOpen && (
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={handleLogout}
+                  className="shrink-0 text-sidebar-foreground/60 hover:text-destructive hover:bg-destructive/10"
+                  title="Sair"
+                >
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </aside>
@@ -155,16 +188,24 @@ export function Shell({ children }: { children: React.ReactNode }) {
               {navContent(true)}
             </nav>
 
-            <div className="p-4 border-t border-sidebar-border">
+            <div className="p-4 border-t border-sidebar-border space-y-4">
               <div className="flex items-center">
                 <div className="w-8 h-8 bg-sidebar-accent rounded-full flex items-center justify-center shrink-0">
                   <User className="w-4 h-4" />
                 </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium leading-none">João Silva</p>
-                  <p className="text-xs text-sidebar-foreground/60 mt-1">Profissional</p>
+                <div className="ml-3 overflow-hidden">
+                  <p className="text-sm font-medium leading-none truncate">{user?.name || 'Usuário'}</p>
+                  <p className="text-xs text-sidebar-foreground/60 mt-1 truncate">{user?.email}</p>
                 </div>
               </div>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20" 
+                onClick={handleLogout}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sair da conta
+              </Button>
             </div>
           </div>
         </SheetContent>
@@ -175,9 +216,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
         {/* Topbar / Navbar */}
         <header className="h-16 bg-card border-b border-border flex items-center justify-between px-4 sm:px-6 z-10" role="banner">
           <div className="flex items-center min-w-0">
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => {
                 if (typeof window !== 'undefined' && window.innerWidth < 768) {
                   setIsMobileNavOpen(true)
@@ -193,7 +234,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               {navItems.find(item => item.href === pathname)?.name || 'Aplicativo'}
             </h1>
           </div>
-          
+
           <div className="flex items-center gap-2 sm:space-x-4">
             <Button
               variant="ghost"

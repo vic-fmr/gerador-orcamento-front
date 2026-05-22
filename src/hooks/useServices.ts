@@ -1,16 +1,30 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ServiceItem, useServiceStore } from '@/store/useServiceStore'
+import { useEffect } from 'react'
+import {
+  getServices,
+  createService as apiCreateService,
+  updateService as apiUpdateService,
+  deleteService as apiDeleteService,
+  ServiceItem,
+} from '@/lib/api'
+import { useServiceStore } from '@/store/useServiceStore'
 
 export function useServices() {
-  const services = useServiceStore((state) => state.services)
+  const setServices = useServiceStore((s) => s.setServices)
 
-  return useQuery({
+  const query = useQuery<ServiceItem[]>({
     queryKey: ['services'],
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      return services
+      return await getServices()
     },
   })
+
+  useEffect(() => {
+    const data = query.data
+    if (data && Array.isArray(data)) setServices(data)
+  }, [query.data, setServices])
+
+  return query
 }
 
 export function useCreateService() {
@@ -18,10 +32,10 @@ export function useCreateService() {
   const addService = useServiceStore((state) => state.addService)
 
   return useMutation({
-    mutationFn: async (newService: ServiceItem) => {
-      await new Promise((resolve) => setTimeout(resolve, 800))
-      addService(newService)
-      return newService
+    mutationFn: async (newService: Omit<ServiceItem, 'id'>) => {
+      const created = await apiCreateService(newService)
+      addService(created)
+      return created
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] })
@@ -34,10 +48,10 @@ export function useUpdateService() {
   const updateService = useServiceStore((state) => state.updateService)
 
   return useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: Partial<ServiceItem> }) => {
-      await new Promise((resolve) => setTimeout(resolve, 800))
+    mutationFn: async ({ id, updates }: { id: number; updates: Partial<ServiceItem> }) => {
+      const updated = await apiUpdateService(id, updates)
       updateService(id, updates)
-      return { id, updates }
+      return updated
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] })
@@ -50,8 +64,8 @@ export function useDeleteService() {
   const removeService = useServiceStore((state) => state.removeService)
 
   return useMutation({
-    mutationFn: async (id: string) => {
-      await new Promise((resolve) => setTimeout(resolve, 500))
+    mutationFn: async (id: number) => {
+      await apiDeleteService(id)
       removeService(id)
       return id
     },

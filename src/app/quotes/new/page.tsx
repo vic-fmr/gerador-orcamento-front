@@ -9,17 +9,21 @@ import { ArrowLeft, Save, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Estimate } from '@/store/useEstimateStore'
+import { Quote } from '@/store/useQuoteStore'
 import Link from 'next/link'
 import { LineItemsEditor } from '@/components/estimates/LineItemsEditor'
 import { Controller, Path } from 'react-hook-form'
-import { useCreateEstimate } from '@/hooks/useEstimates'
+import { useCreateQuote } from '@/hooks/useQuotes'
 import { ClientSelect } from '@/components/estimates/ClientSelect'
-import { EstimatePreview } from '@/components/estimates/EstimatePreview'
+import { useClientStore } from '@/store/useClientStore'
+import { generateQuotePDF } from '@/lib/pdf-export'
+import { generateQuoteDOCX } from '@/lib/docx-export'
+import { resolveEstimateClient } from '@/lib/estimate-document'
+import { Download, FileEdit } from 'lucide-react'
 
-const estimateSchema = z.object({
+const quoteSchema = z.object({
   title: z.string().min(3, 'O título deve ter pelo menos 3 caracteres'),
-  client: z.string().min(1, 'O cliente é obrigatório'),
+  client: z.number().int().min(1, 'O cliente é obrigatório'),
   items: z.array(z.object({
     id: z.string(),
     description: z.string().min(1, 'Descrição é obrigatória'),
@@ -29,13 +33,12 @@ const estimateSchema = z.object({
   })).min(1, 'Adicione pelo menos um item'),
 })
 
-type EstimateFormValues = z.infer<typeof estimateSchema>
+type QuoteFormValues = z.infer<typeof quoteSchema>
 
-export default function NewEstimatePage() {
+export function NewQuotePage() {
   const router = useRouter()
   const [step, setStep] = React.useState(1)
-  const [isPreviewOpen, setIsPreviewOpen] = React.useState(false)
-  const createEstimate = useCreateEstimate()
+  const createQuote = useCreateQuote()
 
   const {
     register,
@@ -44,37 +47,36 @@ export default function NewEstimatePage() {
     trigger,
     watch,
     formState: { errors },
-  } = useForm<EstimateFormValues>({
-    resolver: zodResolver(estimateSchema),
+  } = useForm<QuoteFormValues>({
+    resolver: zodResolver(quoteSchema),
     defaultValues: {
       items: [],
-      client: '',
+      client: 0,
     },
   })
 
   const items = watch('items')
   const title = watch('title')
-  const clientName = watch('client')
+  const clientId = watch('client')
 
-  const onSubmit = (data: EstimateFormValues) => {
+  const onSubmit = (data: QuoteFormValues) => {
     if (step < 3) {
       nextStep()
       return
     }
 
     const totalAmount = data.items.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0)
-    
-    const newEstimate = {
-      id: crypto.randomUUID(),
+
+    const newQuote = {
       title: data.title,
       client: data.client,
       amount: totalAmount,
-      status: 'pending' as const,
+      status: 'DRAFT' as const,
       date: new Date().toISOString(),
       items: data.items,
     }
-    
-    createEstimate.mutate(newEstimate, {
+
+    createQuote.mutate(newQuote, {
       onSuccess: () => {
         router.push('/')
       }
@@ -83,7 +85,7 @@ export default function NewEstimatePage() {
 
   const nextStep = async (e?: React.MouseEvent) => {
     if (e) e.preventDefault()
-    const fieldsToValidate: Path<EstimateFormValues>[] = step === 1 ? ['title', 'client'] : ['items']
+    const fieldsToValidate: Path<QuoteFormValues>[] = step === 1 ? ['title', 'client'] : ['items']
     const result = await trigger(fieldsToValidate)
     if (result) setStep(step + 1)
   }
@@ -95,22 +97,36 @@ export default function NewEstimatePage() {
 
   const totalAmount = items.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0)
 
-  const currentEstimateForPreview: Estimate = {
-    id: 'draft',
+  const clients = useClientStore((s) => s.clients)
+  const clientData = clients.find((c) => c.id === clientId)
+  const clientNameForPreview = clientData?.name || ''
+
+  const currentQuoteForPreview: Quote = {
+    id: 0,
     title,
-    client: clientName,
+    client: clientId,
     amount: totalAmount,
-    status: 'pending' as const,
+    status: 'DRAFT' as const,
     date: new Date().toISOString(),
     items: items,
+  }
+
+  const handleExportPDF = (e: React.MouseEvent) => {
+    e.preventDefault()
+    generateQuotePDF(currentQuoteForPreview, resolveEstimateClient(clientId, clients))
+  }
+
+  const handleExportDOCX = (e: React.MouseEvent) => {
+    e.preventDefault()
+    generateQuoteDOCX(currentQuoteForPreview, resolveEstimateClient(clientId, clients))
   }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="inline-flex items-center justify-center size-8 rounded-md hover:bg-muted transition-colors"
             aria-label="Voltar"
           >
@@ -127,8 +143,8 @@ export default function NewEstimatePage() {
         </div>
       </div>
 
-      <form 
-        onSubmit={step === 3 ? handleSubmit(onSubmit) : (e) => e.preventDefault()} 
+      <form
+        onSubmit={step === 3 ? handleSubmit(onSubmit) : (e) => e.preventDefault()}
         className="space-y-8 bg-card p-6 rounded-xl shadow-sm border border-border"
         onKeyDown={(e) => {
           if (e.key === 'Enter' && step < 3) {
@@ -192,18 +208,9 @@ export default function NewEstimatePage() {
         {step === 3 && (
           <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
             <div className="flex items-center justify-between">
-               <h3 className="text-lg font-semibold">Resumo do Orçamento</h3>
-               <Button 
-                 type="button" 
-                 variant="outline" 
-                 size="sm"
-                 onClick={() => setIsPreviewOpen(true)}
-               >
-                 <Eye className="mr-2 h-4 w-4" />
-                 Ver Prévia do Documento
-               </Button>
+              <h3 className="text-lg font-semibold">Resumo do Orçamento</h3>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg">
               <div>
                 <Label className="text-muted-foreground">Projeto</Label>
@@ -211,7 +218,7 @@ export default function NewEstimatePage() {
               </div>
               <div>
                 <Label className="text-muted-foreground">Cliente</Label>
-                <p className="font-semibold text-lg">{clientName}</p>
+                <p className="font-semibold text-lg">{clientNameForPreview}</p>
               </div>
             </div>
 
@@ -268,28 +275,43 @@ export default function NewEstimatePage() {
               </Button>
             )}
           </div>
-          
+
           <div className="flex gap-4">
             {step < 3 ? (
               <Button type="button" onClick={nextStep} className="bg-primary hover:bg-primary/90 flex-1 sm:flex-initial h-11 sm:h-9">
                 Próximo
               </Button>
             ) : (
-              <Button type="submit" disabled={createEstimate.isPending} className="bg-primary hover:bg-primary/90 flex-1 sm:flex-initial h-11 sm:h-9">
-                <Save className="mr-2 h-4 w-4" />
-                Salvar Orçamento
-              </Button>
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleExportDOCX}
+                  className="flex-1 sm:flex-initial h-11 sm:h-9 text-blue-600 hover:bg-blue-50"
+                >
+                  <FileEdit className="mr-2 h-4 w-4" />
+                  DOCX
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleExportPDF}
+                  className="flex-1 sm:flex-initial h-11 sm:h-9 text-primary hover:bg-primary/5"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  PDF
+                </Button>
+                <Button type="submit" disabled={createQuote.isPending} className="bg-primary hover:bg-primary/90 flex-1 sm:flex-initial h-11 sm:h-9">
+                  <Save className="mr-2 h-4 w-4" />
+                  Salvar Orçamento
+                </Button>
+              </>
             )}
           </div>
         </div>
       </form>
-
-      {isPreviewOpen && (
-        <EstimatePreview 
-          estimate={currentEstimateForPreview} 
-          onClose={() => setIsPreviewOpen(false)} 
-        />
-      )}
     </div>
   )
 }
+
+export default NewQuotePage

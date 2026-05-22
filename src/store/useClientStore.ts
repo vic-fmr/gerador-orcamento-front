@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
 export interface Client {
-  id: string
+  id: number
   name: string
   email?: string
   phone?: string
@@ -11,17 +11,22 @@ export interface Client {
 
 interface ClientState {
   clients: Client[]
+  setClients: (clients: Client[]) => void
   addClient: (client: Client) => void
+  updateClient: (id: number, updates: Partial<Client>) => void
+  removeClient: (id: number) => void
 }
 
 export const useClientStore = create<ClientState>((set) => ({
-  clients: [
-    { id: 'cli1', name: 'Global Tech Inc.', email: 'contact@globaltech.com', address: 'Av. Paulista, 1000', addressName: 'Escritório SP' },
-    { id: 'cli2', name: 'Home Services Ltd', email: 'info@homeservices.com', phone: '(11) 99999-9999', address: 'Rua Direita, 20', addressName: 'Sede' },
-    { id: 'cli3', name: 'City Apartments', email: 'management@cityapartments.com', address: 'Rua das Flores, 50', addressName: 'Condomínio' },
-    { id: 'cli4', name: 'Maria Oliveira', email: 'maria@gmail.com', phone: '(21) 98888-8888', address: 'Av. Rio Branco, 200', addressName: 'Trabalho' },
-  ],
+  clients: [],
+  setClients: (clients) => set(() => ({ clients })),
   addClient: (client) => set((state) => ({ 
     clients: [client, ...state.clients] 
+  })),
+  updateClient: (id, updates) => set((state) => ({
+    clients: state.clients.map((c) => c.id === id ? { ...c, ...updates } : c)
+  })),
+  removeClient: (id) => set((state) => ({
+    clients: state.clients.filter((c) => c.id !== id)
   })),
 }))

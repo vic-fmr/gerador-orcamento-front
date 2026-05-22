@@ -2,26 +2,44 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Check, ChevronsUpDown, Search, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useClientStore } from '@/store/useClientStore'
+import { useClients } from '@/hooks/useClients'
+import { CreateClientSheet } from '../clients/CreateClientSheet'
 
 interface ClientSelectProps {
-  value: string
-  onChange: (value: string) => void
+  value: number | 0
+  onChange: (value: number) => void
   id?: string
 }
 
 export function ClientSelect({ value, onChange, id }: ClientSelectProps) {
-  const clients = useClientStore((state) => state.clients)
+  // ensure clients are fetched
+  const { data: clientsData } = useClients()
+  const clientsFromStore = useClientStore((state) => state.clients)
+  const clients = React.useMemo(() => {
+    const queriedClients = Array.isArray(clientsData) ? clientsData : []
+    const byId = new Map<number, (typeof clientsFromStore)[number]>()
+    for (const client of queriedClients) {
+      byId.set(client.id, client)
+    }
+    for (const client of clientsFromStore) {
+      byId.set(client.id, client)
+    }
+    return Array.from(byId.values())
+  }, [clientsData, clientsFromStore])
+
   const [searchTerm, setSearchTerm] = useState('')
   const [isOpen, setIsOpen] = useState(false)
+  const [isCreateClientOpen, setIsCreateClientOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const normalizedSearchTerm = searchTerm.trim()
 
   const filteredClients = React.useMemo(
     () => clients.filter((client) => client.name.toLowerCase().includes(searchTerm.toLowerCase())),
     [clients, searchTerm]
   )
 
-  const handleSelect = (clientName: string) => {
-    onChange(clientName)
+  const handleSelect = (clientId: number) => {
+    onChange(clientId)
     setIsOpen(false)
     setSearchTerm('')
   }
@@ -37,6 +55,8 @@ export function ClientSelect({ value, onChange, id }: ClientSelectProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  const selectedName = clients?.find((c) => c.id === value)?.name
+
   return (
     <div className="relative" ref={containerRef}>
       <Button
@@ -49,7 +69,7 @@ export function ClientSelect({ value, onChange, id }: ClientSelectProps) {
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="truncate">
-          {value || "Selecione um cliente..."}
+          {selectedName || "Selecione um cliente..."}
         </span>
         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </Button>
@@ -63,7 +83,7 @@ export function ClientSelect({ value, onChange, id }: ClientSelectProps) {
               placeholder="Procurar cliente..."
               aria-label="Procurar cliente"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}    
+              onChange={(e) => setSearchTerm(e.target.value)}
               autoFocus
             />          </div>
           <div className="max-h-[min(300px,50vh)] overflow-y-auto p-1">
@@ -77,29 +97,40 @@ export function ClientSelect({ value, onChange, id }: ClientSelectProps) {
                   key={client.id}
                   type="button"
                   className="relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground transition-colors"
-                  onClick={() => handleSelect(client.name)}
+                  onClick={() => handleSelect(client.id)}
                 >
-                  <Check className={`mr-2 h-4 w-4 text-primary ${value === client.name ? 'opacity-100' : 'opacity-0'}`} />
+                  <Check className={`mr-2 h-4 w-4 text-primary ${value === client.id ? 'opacity-100' : 'opacity-0'}`} />
                   {client.name}
                 </button>
               ))
             )}
-            
+
             <div className="border-t border-border mt-1 pt-1">
-               <button
-                 type="button"
-                 className="flex w-full items-center rounded-sm px-2 py-2 text-sm text-primary font-medium hover:bg-primary hover:text-white cursor-pointer transition-colors"
-                 onClick={() => {
-                   if (searchTerm) handleSelect(searchTerm)
-                 }}
-               >
-                 <Plus className="mr-2 h-4 w-4" />
-                 {searchTerm ? `Adicionar "${searchTerm}"` : "Novo Cliente"}
-               </button>
+              <button
+                type="button"
+                className="flex w-full items-center rounded-sm px-2 py-2 text-sm text-primary font-medium hover:bg-primary hover:text-white cursor-pointer transition-colors"
+                onClick={() => {
+                  setIsOpen(false)
+                  setIsCreateClientOpen(true)
+                }}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                {normalizedSearchTerm ? `Novo cliente: "${normalizedSearchTerm}"` : 'Novo Cliente'}
+              </button>
             </div>
           </div>
         </div>
-      )}
-    </div>
+      )
+      }
+
+      <CreateClientSheet
+        open={isCreateClientOpen}
+        onOpenChange={setIsCreateClientOpen}
+        onSuccess={(createdClient) => {
+          handleSelect(createdClient.id)
+        }}
+        trigger={null}
+      />
+    </div >
   )
 }

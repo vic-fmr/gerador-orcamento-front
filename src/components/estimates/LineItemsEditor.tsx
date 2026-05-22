@@ -3,9 +3,11 @@ import { Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { LineItem } from '@/store/useEstimateStore'
+import { LineItem } from '@/store/useQuoteStore'
 
 import { ServiceItem, useServiceStore } from '@/store/useServiceStore'
+import { useServices } from '@/hooks/useServices'
+import { ServiceSheet } from '@/components/services/ServiceSheet'
 
 interface LineItemsEditorProps {
   items: LineItem[]
@@ -13,7 +15,24 @@ interface LineItemsEditorProps {
 }
 
 export function LineItemsEditor({ items, onChange }: LineItemsEditorProps) {
-  const services = useServiceStore((state) => state.services)
+  // ensure services are fetched from API and stored in the service store
+  const { data: servicesData } = useServices()
+  const servicesFromStore = useServiceStore((state) => state.services)
+  const services = React.useMemo(() => {
+    const queriedServices = Array.isArray(servicesData) ? servicesData : []
+    const byId = new Map<number, (typeof servicesFromStore)[number]>()
+
+    for (const service of queriedServices) {
+      byId.set(service.id, service)
+    }
+
+    for (const service of servicesFromStore) {
+      byId.set(service.id, service)
+    }
+
+    return Array.from(byId.values())
+  }, [servicesData, servicesFromStore])
+  const [isCreateServiceOpen, setIsCreateServiceOpen] = React.useState(false)
 
   const addItemFromService = React.useCallback((service: ServiceItem) => {
     const newItem: LineItem = {
@@ -22,6 +41,7 @@ export function LineItemsEditor({ items, onChange }: LineItemsEditorProps) {
       quantity: 1,
       unitPrice: service.defaultUnitPrice,
       unit: service.unit,
+      serviceId: service.id,
     }
     onChange([...items, newItem])
   }, [onChange, items])
@@ -122,20 +142,39 @@ export function LineItemsEditor({ items, onChange }: LineItemsEditorProps) {
     <div className="space-y-6">
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Serviços Cadastrados</h3>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {services.map((service) => (
-            <ServiceButton key={service.id} service={service} />
-          ))}
-        </div>
+        {services.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-border p-6 text-center space-y-3">
+            <p className="text-sm text-muted-foreground">Nenhum serviço cadastrado ainda.</p>
+            <Button type="button" onClick={() => setIsCreateServiceOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Cadastrar Serviço
+            </Button>
+          </div>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {services.map((service) => (
+              <ServiceButton key={service.id} service={service} />
+            ))}
+
+          </div>
+        )}
+        {services.length > 0 && (
+          <div className="pt-2">
+            <Button type="button" onClick={() => setIsCreateServiceOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Cadastrar Serviço
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">Itens do Orçamento</h3>
-          <Button 
-            type="button" 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
             onClick={addCustomItem}
           >
             <Plus className="mr-2 h-4 w-4" />
@@ -156,14 +195,14 @@ export function LineItemsEditor({ items, onChange }: LineItemsEditorProps) {
               </div>
               <div className="grid grid-cols-2 gap-3 md:col-span-4 md:grid-cols-2">
                 <div className="space-y-1.5">
-                <Label>Qtd ({item.unit})</Label>
-                <Input
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  value={item.quantity}
-                  onChange={(e) => updateItem(item.id, { quantity: Number(e.target.value) })}
-                />
+                  <Label>Qtd ({item.unit})</Label>
+                  <Input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={item.quantity}
+                    onChange={(e) => updateItem(item.id, { quantity: Number(e.target.value) })}
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Preço Unit.</Label>
@@ -203,6 +242,12 @@ export function LineItemsEditor({ items, onChange }: LineItemsEditorProps) {
           </div>
         </div>
       )}
+
+      <ServiceSheet
+        open={isCreateServiceOpen}
+        onOpenChange={setIsCreateServiceOpen}
+        service={null}
+      />
     </div>
   )
 }

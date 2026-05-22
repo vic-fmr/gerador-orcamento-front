@@ -5,7 +5,7 @@ export const UNIT_OPTIONS = ['un', 'm', 'm²', 'm³', 'kg', 'h', 'dia', 'mês'] 
 export type Unit = (typeof UNIT_OPTIONS)[number]
 
 export interface ServiceItem {
-  id: string
+  id: number
   name: string
   description: string
   unit: Unit
@@ -15,62 +15,21 @@ export interface ServiceItem {
 interface ServiceState {
   services: ServiceItem[]
   items: ServiceItem[]
+  setServices: (services: ServiceItem[]) => void
   addService: (service: ServiceItem) => void
-  updateService: (id: string, updates: Partial<ServiceItem>) => void
-  removeService: (id: string) => void
+  updateService: (id: number, updates: Partial<ServiceItem>) => void
+  removeService: (id: number) => void
   addItem: (service: ServiceItem) => void
-  updateItem: (id: string, updates: Partial<ServiceItem>) => void
-  removeItem: (id: string) => void
+  updateItem: (id: number, updates: Partial<ServiceItem>) => void
+  removeItem: (id: number) => void
 }
 
-export const defaultServices: ServiceItem[] = [
-  {
-    id: 'srv1',
-    name: 'Pintura de Parede (Látex)',
-    description: 'Aplicação de pintura interna com acabamento padrão',
-    unit: 'm²',
-    defaultUnitPrice: 45,
-  },
-  {
-    id: 'srv2',
-    name: 'Instalação de Piso Cerâmico',
-    description: 'Assentamento e nivelamento de revestimento cerâmico',
-    unit: 'm²',
-    defaultUnitPrice: 65,
-  },
-  {
-    id: 'srv3',
-    name: 'Mão de Obra Pedreiro',
-    description: 'Serviço de execução e apoio em obra',
-    unit: 'dia',
-    defaultUnitPrice: 250,
-  },
-  {
-    id: 'srv4',
-    name: 'Cimento (Saco 50kg)',
-    description: 'Fornecimento de material para execução de obra',
-    unit: 'un',
-    defaultUnitPrice: 38,
-  },
-  {
-    id: 'srv5',
-    name: 'Tubulação PVC 1/2"',
-    description: 'Fornecimento de tubulação para instalação hidráulica',
-    unit: 'm',
-    defaultUnitPrice: 12.5,
-  },
-  {
-    id: 'srv6',
-    name: 'Consultoria Técnica',
-    description: 'Acompanhamento técnico e orientação especializada',
-    unit: 'h',
-    defaultUnitPrice: 150,
-  },
-]
+export const defaultServices: ServiceItem[] = []
 
 export const useServiceStore = create<ServiceState>((set) => ({
-  services: defaultServices,
-  items: defaultServices,
+  services: [],
+  items: [],
+  setServices: (services) => set(() => ({ services, items: services })),
   addService: (service) => set((state) => ({
     services: [service, ...state.services],
     items: [service, ...state.items],

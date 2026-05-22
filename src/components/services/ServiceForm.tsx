@@ -37,7 +37,7 @@ export function ServiceForm({ defaultValues, onSubmit, isSubmitting, submitLabel
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ServiceFormValues>({
+  } = useForm<z.input<typeof serviceSchema>, unknown, ServiceFormValues>({
     resolver: zodResolver(serviceSchema),
     defaultValues: mergedDefaultValues,
   })

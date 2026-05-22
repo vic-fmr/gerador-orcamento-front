@@ -13,7 +13,7 @@ const ClientRow = React.memo(function ClientRow({ client }: { client: Client }) 
     <tr key={client.id} className="border-b border-border hover:bg-muted/30 transition-colors">
       <td className="p-4">
         <div className="font-medium text-sm">{client.name}</div>
-        <div className="text-xs text-muted-foreground">ID: {client.id.slice(0, 8)}</div>
+        <div className="text-xs text-muted-foreground">ID: {client.id}</div>
       </td>
       <td className="p-4">
         <div className="flex flex-col gap-0.5">
@@ -88,31 +88,31 @@ export function ClientsTable({ clients }: ClientsTableProps) {
                 <h3 className="font-bold text-base leading-tight">{client.name}</h3>
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <User className="h-3 w-3" />
-                  ID: {client.id.slice(0, 8)}
+                  ID: {client.id}
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-3 pt-2">
               <div className="space-y-1">
-                 <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                   <Mail className="h-3 w-3" />
-                   Contato
-                 </div>
-                 <p className="text-sm font-medium">{client.email || 'N/A'}</p>
-                 <p className="text-xs text-muted-foreground">{client.phone || 'N/A'}</p>
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                  <Mail className="h-3 w-3" />
+                  Contato
+                </div>
+                <p className="text-sm font-medium">{client.email || 'N/A'}</p>
+                <p className="text-xs text-muted-foreground">{client.phone || 'N/A'}</p>
               </div>
-              
+
               {client.address && (
                 <div className="space-y-1">
-                   <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                     <MapPin className="h-3 w-3" />
-                     Endereço
-                   </div>
-                   <p className="text-sm font-medium">{client.address}</p>
-                   {client.addressName && (
-                     <p className="text-xs text-muted-foreground">{client.addressName}</p>
-                   )}
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    <MapPin className="h-3 w-3" />
+                    Endereço
+                  </div>
+                  <p className="text-sm font-medium">{client.address}</p>
+                  {client.addressName && (
+                    <p className="text-xs text-muted-foreground">{client.addressName}</p>
+                  )}
                 </div>
               )}
             </div>

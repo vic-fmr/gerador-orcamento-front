@@ -1,11 +1,17 @@
 import { renderHook, waitFor } from '@testing-library/react'
 import { useClients, useCreateClient } from './useClients'
-import { expect, test, beforeEach, describe } from 'vitest'
+import { expect, test, beforeEach, describe, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useClientStore } from '@/store/useClientStore'
 import { ReactNode } from 'react'
+import * as api from '@/lib/api'
 
-const queryClient = new QueryClient({
+vi.mock('@/lib/api', () => ({
+  getClients: vi.fn(),
+  createClient: vi.fn(),
+}))
+
+const createTestQueryClient = () => new QueryClient({
   defaultOptions: {
     queries: {
       retry: false,
@@ -13,24 +19,24 @@ const queryClient = new QueryClient({
   },
 })
 
-const wrapper = ({ children }: { children: ReactNode }) => (
-  <QueryClientProvider client={queryClient}>
-    {children}
-  </QueryClientProvider>
-)
+const wrapper = ({ children }: { children: ReactNode }) => {
+  const queryClient = createTestQueryClient()
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+    </QueryClientProvider>
+  )
+}
 
 describe('useClients hooks', () => {
   beforeEach(() => {
     useClientStore.setState({ clients: [] })
-    queryClient.clear()
+    vi.clearAllMocks()
   })
 
   test('useClients fetches clients', async () => {
-    useClientStore.setState({ 
-      clients: [
-        { id: 'cli1', name: 'Test Client', email: 'test@example.com' }
-      ] 
-    })
+    const mockClients = [{ id: 1, name: 'Test Client', email: 'test@example.com' }]
+    vi.mocked(api.getClients).mockResolvedValue(mockClients)
     
     const { result } = renderHook(() => useClients(), { wrapper })
     
@@ -40,16 +46,17 @@ describe('useClients hooks', () => {
   })
 
   test('useCreateClient adds a new client', async () => {
+    const newClient = { name: 'New Test', email: 'new@example.com' }
+    const createdClient = { id: 2, ...newClient }
+    vi.mocked(api.createClient).mockResolvedValue(createdClient)
+
     const { result } = renderHook(() => useCreateClient(), { wrapper })
-    
-    const newClient = { id: 'new-cli', name: 'New Test', email: 'new@example.com' }
     
     result.current.mutate(newClient)
     
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
     
     const clients = useClientStore.getState().clients
-    expect(clients).toHaveLength(1)
-    expect(clients[0].name).toBe('New Test')
+    expect(clients).toContainEqual(createdClient)
   })
 })
