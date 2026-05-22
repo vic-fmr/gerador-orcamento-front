@@ -107,63 +107,63 @@ export async function login(data: { email: string; password: string }): Promise<
 
 // Clients API
 export async function getClients(): Promise<Client[]> {
-  return apiGet<Client[]>('/clients')
+  return apiGet<Client[]>('/api/clients')
 }
 
 export async function getClient(id: number): Promise<Client> {
-  return apiGet<Client>(`/clients/${id}`)
+  return apiGet<Client>(`/api/clients/${id}`)
 }
 
 export async function createClient(data: Omit<Client, 'id'>): Promise<Client> {
-  return apiPost<Client>('/clients', data)
+  return apiPost<Client>('/api/clients', data)
 }
 
 export async function updateClient(id: number, data: Partial<Client>): Promise<Client> {
-  return apiPut<Client>(`/clients/${id}`, data)
+  return apiPut<Client>(`/api/clients/${id}`, data)
 }
 
 export async function deleteClient(id: number): Promise<void> {
-  return apiDelete<void>(`/clients/${id}`)
+  return apiDelete<void>(`/api/clients/${id}`)
 }
 
 // Services API
 export async function getServices(): Promise<ServiceItem[]> {
-  return apiGet<ServiceItem[]>('/services')
+  return apiGet<ServiceItem[]>('/api/services')
 }
 
 export async function getService(id: number): Promise<ServiceItem> {
-  return apiGet<ServiceItem>(`/services/${id}`)
+  return apiGet<ServiceItem>(`/api/services/${id}`)
 }
 
 export async function createService(data: Omit<ServiceItem, 'id'>): Promise<ServiceItem> {
-  return apiPost<ServiceItem>('/services', data)
+  return apiPost<ServiceItem>('/api/services', data)
 }
 
 export async function updateService(id: number, data: Partial<ServiceItem>): Promise<ServiceItem> {
-  return apiPut<ServiceItem>(`/services/${id}`, data)
+  return apiPut<ServiceItem>(`/api/services/${id}`, data)
 }
 
 export async function deleteService(id: number): Promise<void> {
-  return apiDelete<void>(`/services/${id}`)
+  return apiDelete<void>(`/api/services/${id}`)
 }
 
 // Quotes API (renamed from estimates)
 export async function getQuotes(): Promise<Quote[]> {
-  return apiGet<Quote[]>('/quotes')
+  return apiGet<Quote[]>('/api/quotes')
 }
 
 export async function getQuote(id: number): Promise<Quote> {
-  return apiGet<Quote>(`/quotes/${id}`)
+  return apiGet<Quote>(`/api/quotes/${id}`)
 }
 
 export async function createQuote(data: Omit<Quote, 'id'>): Promise<Quote> {
-  return apiPost<Quote>('/quotes', data)
+  return apiPost<Quote>('/api/quotes', data)
 }
 
 export async function updateQuote(id: number, data: Partial<Quote>): Promise<Quote> {
-  return apiPut<Quote>(`/quotes/${id}`, data)
+  return apiPut<Quote>(`/api/quotes/${id}`, data)
 }
 
 export async function deleteQuote(id: number): Promise<void> {
-  return apiDelete<void>(`/quotes/${id}`)
+  return apiDelete<void>(`/api/quotes/${id}`)
 }
