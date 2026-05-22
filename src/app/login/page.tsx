@@ -12,6 +12,8 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 import { useAuthStore } from '@/store/useAuthStore'
+import { login as apiLogin } from '@/lib/api'
+import { ApiError } from '@/lib/api-client'
 
 const loginSchema = z.object({
   email: z.string().email({ message: "E-mail inválido" }),
@@ -25,6 +27,7 @@ export default function LoginPage() {
   const login = useAuthStore((state) => state.login)
   const [isLoading, setIsLoading] = React.useState(false)
   const [showPassword, setShowPassword] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
 
   const {
     register,
@@ -40,19 +43,42 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true)
-    // Simulate API call
-    console.log('Login attempt:', data)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    setError(null)
     
-    // Mock successful login
-    login({
-      id: '1',
-      name: 'João Silva',
-      email: data.email,
-    }, 'mock-bearer-token-123')
-    
-    setIsLoading(false)
-    router.push('/')
+    try {
+      const token = await apiLogin(data)
+      
+      if (!token) {
+        throw new Error('Token não recebido do servidor')
+      }
+
+      // Extract name from email as a fallback since we don't have a user endpoint
+      const name = data.email.split('@')[0]
+        .split(/[._-]/)
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ')
+
+      login({
+        id: 'user-id', // Generic ID as fallback
+        name,
+        email: data.email,
+      }, token)
+      
+      router.push('/')
+    } catch (err) {
+      console.error('Login error:', err)
+      if (err instanceof ApiError) {
+        if (err.status === 401) {
+          setError('E-mail ou senha incorretos.')
+        } else {
+          setError(`Erro no servidor: ${err.status}`)
+        }
+      } else {
+        setError('Ocorreu um erro inesperado. Tente novamente.')
+      }
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -73,6 +99,12 @@ export default function LoginPage() {
               Entre com suas credenciais para gerenciar seus orçamentos.
             </p>
           </div>
+
+          {error && (
+            <div className="mt-6 rounded-md bg-destructive/10 p-3 text-sm font-medium text-destructive animate-in fade-in slide-in-from-top-1 duration-200">
+              {error}
+            </div>
+          )}
 
           <div className="mt-8">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

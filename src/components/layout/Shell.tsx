@@ -56,8 +56,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     try {
       const storedTheme = window.localStorage.getItem('theme')
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      const initialTheme = storedTheme === 'dark' || (!storedTheme && prefersDark) ? 'dark' : 'light'
+      const initialTheme = storedTheme === 'dark' ? 'dark' : 'light'
 
       setTheme(initialTheme)
       document.documentElement.classList.toggle('dark', initialTheme === 'dark')

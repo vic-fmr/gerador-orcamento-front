@@ -95,6 +95,16 @@ export interface Quote {
   items: LineItem[]
 }
 
+// Auth API
+export async function login(data: { email: string; password: string }): Promise<string> {
+  // Assuming the backend returns the token directly as a string or in an object { token: "..." }
+  // If it returns only the token string, the apiPost might need adjustment if it expects JSON object
+  // But usually it's an object. Let's assume the apiPost handles it.
+  const response = await apiPost<{ token?: string } | string>('/auth/login', data)
+  if (typeof response === 'string') return response
+  return response.token || ''
+}
+
 // Clients API
 export async function getClients(): Promise<Client[]> {
   return apiGet<Client[]>('/clients')
