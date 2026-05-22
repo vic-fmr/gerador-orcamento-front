@@ -38,6 +38,22 @@ function normalizeStatus(value: unknown) {
   return normalizeQuoteStatus(value)
 }
 
+function normalizeDate(value: unknown): string {
+  if (typeof value === 'string' && value.trim() !== '') {
+    const date = new Date(value)
+    if (!isNaN(date.getTime())) {
+      return value
+    }
+  }
+
+  if (value instanceof Date && !isNaN(value.getTime())) {
+    return value.toISOString()
+  }
+
+  // Fallback to current date if missing or invalid
+  return new Date().toISOString()
+}
+
 function normalizeQuote(quote: Quote) {
   // Try to find the amount in various possible fields that might come from different backend versions
   const rawAmount = (quote as any).amount ?? 
@@ -56,9 +72,16 @@ function normalizeQuote(quote: Quote) {
     }, 0)
   }
 
+  // Normalize date field
+  const rawDate = (quote as any).date ?? 
+                 (quote as any).created_at ?? 
+                 (quote as any).createdAt ?? 
+                 (quote as any).data
+
   return {
     ...quote,
     amount,
+    date: normalizeDate(rawDate),
     status: normalizeStatus((quote as any).status),
   }
 }
@@ -136,15 +159,10 @@ export function useCreateQuote() {
               ? (createdClient as { id: number }).id
               : (payload as any).clientId
 
-      const normalizedAmount = normalizeAmount((created as any).amount ?? (payload as any).amount)
-      const normalizedStatus = normalizeStatus((created as any).status ?? (payload as any).status)
-
-      const normalizedQuote = {
+      const normalizedQuote = normalizeQuote({
         ...created,
         client: normalizedClientId,
-        amount: normalizedAmount,
-        status: normalizedStatus,
-      }
+      } as any)
 
       addQuote(normalizedQuote as any)
       return normalizedQuote as any
