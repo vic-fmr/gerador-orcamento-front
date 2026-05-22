@@ -94,9 +94,9 @@ export default function QuotesHistory() {
   return (
     <div className="space-y-6">
 
-      <div className='flex justify-between items-center'>
-        <div className="w-full flex justify-between items-center bg-card p-4 rounded-xl border border-border shadow-sm">
-          <div className=" space-y-1.5">
+      <div className="bg-card p-4 rounded-xl border border-border shadow-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+          <div className="space-y-1.5">
             <Label htmlFor="search">Procurar</Label>
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -132,14 +132,12 @@ export default function QuotesHistory() {
           </div>
           <Link
             href="/quotes/new"
-            className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring h-9"
           >
             <Plus className="mr-2 h-4 w-4" />
             Novo Orçamento
           </Link>
         </div>
-
-
       </div>
 
       {/* Desktop Table View */}

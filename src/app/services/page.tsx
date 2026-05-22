@@ -48,25 +48,28 @@ export default function ServicesPage() {
   return (
     <div className="space-y-6">
 
-      <div className="flex justify-between items-center gap-4 bg-card p-4 rounded-xl border border-border shadow-sm">
-        <div className="space-y-1.5 md:col-span-2">
-          <Label htmlFor="search">Procurar</Label>
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              id="search"
-              placeholder="Procurar serviços..."
-              className="pl-9"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+      <div className="bg-card p-4 rounded-xl border border-border shadow-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+          <div className="space-y-1.5">
+            <Label htmlFor="search">Procurar</Label>
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="search"
+                placeholder="Procurar serviços..."
+                className="pl-9"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end">
+            <Button onClick={handleCreate} className="w-full sm:w-auto">
+              <Plus className="mr-2 h-4 w-4" />
+              Novo Serviço
+            </Button>
           </div>
         </div>
-
-        <Button onClick={handleCreate}>
-          <Plus className="mr-2 h-4 w-4" />
-          Novo Serviço
-        </Button>
       </div>
 
       {isLoading ? (

@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAuthStore } from '@/store/useAuthStore'
 import {
   LayoutDashboard,
@@ -35,18 +35,23 @@ const navItems = [
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const router = React.useRef(require('next/navigation').useRouter()).current
+  const router = useRouter()
   const { user, isAuthenticated, logout } = useAuthStore()
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true)
   const [isMobileNavOpen, setIsMobileNavOpen] = React.useState(false)
   const [theme, setTheme] = React.useState<'light' | 'dark'>('light')
+  const [isMounted, setIsMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   React.useEffect(() => {
     // Basic auth check
-    if (!isAuthenticated && pathname !== '/login') {
+    if (isMounted && !isAuthenticated && pathname !== '/login') {
       router.push('/login')
     }
-  }, [isAuthenticated, pathname, router])
+  }, [isAuthenticated, pathname, router, isMounted])
 
   const handleLogout = () => {
     logout()
@@ -66,13 +71,14 @@ export function Shell({ children }: { children: React.ReactNode }) {
   }, [])
 
   React.useEffect(() => {
+    if (!isMounted) return
     try {
       window.localStorage.setItem('theme', theme)
       document.documentElement.classList.toggle('dark', theme === 'dark')
     } catch {
       // Ignore storage errors.
     }
-  }, [theme])
+  }, [theme, isMounted])
 
   const navLinkClass = (href: string) => cn(
     "flex items-center px-3 py-2 rounded-md transition-colors",
@@ -109,6 +115,18 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
   if (pathname === '/login') {
     return <>{children}</>
+  }
+
+  // Show nothing or a loading spinner while checking authentication
+  if (!isMounted || (!isAuthenticated && pathname !== '/login')) {
+    return (
+      <div className="h-screen w-screen flex flex-col items-center justify-center gap-4 bg-background">
+        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center animate-pulse">
+          <FileText className="text-primary w-6 h-6" />
+        </div>
+        <Bell className="w-6 h-6 animate-spin text-muted-foreground opacity-20" />
+      </div>
+    )
   }
 
   return (

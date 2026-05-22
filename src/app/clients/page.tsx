@@ -23,21 +23,25 @@ export default function ClientsPage() {
     <div className="space-y-6">
 
       
-      <div className="flex justify-between items-center gap-4 bg-card p-4 rounded-xl border border-border shadow-sm">
-        <div className="md:col-span-2 space-y-1.5">
-          <Label htmlFor="search">Procurar</Label>
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              id="search"
-              placeholder="Procurar clientes..."
-              className="pl-9"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+      <div className="bg-card p-4 rounded-xl border border-border shadow-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+          <div className="space-y-1.5">
+            <Label htmlFor="search">Procurar</Label>
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="search"
+                placeholder="Procurar clientes..."
+                className="pl-9"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end">
+            <CreateClientSheet />
           </div>
         </div>
-      <CreateClientSheet />
       </div>
     
 
