@@ -1,14 +1,26 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
 import { ClientsTable } from './ClientsTable'
 
+// Mock the hook
+const mockMutate = vi.fn()
+vi.mock('@/hooks/useClients', () => ({
+  useDeleteClient: () => ({
+    mutate: mockMutate
+  })
+}))
+
 const mockClients = [
-  { id: '1', name: 'John Doe', email: 'john@example.com', phone: '1234567890', address: '123 Main St', addressName: 'Home' },
-  { id: '2', name: 'Jane Smith', email: 'jane@example.com' }
+  { id: 1, name: 'John Doe', email: 'john@example.com', phone: '1234567890', address: '123 Main St', addressName: 'Home' },
+  { id: 2, name: 'Jane Smith', email: 'jane@example.com' }
 ]
 
 describe('ClientsTable', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('renders correct headers', () => {
     render(<ClientsTable clients={mockClients} />)
     
@@ -41,5 +53,39 @@ describe('ClientsTable', () => {
   it('renders empty state when no clients provided', () => {
     render(<ClientsTable clients={[]} />)
     expect(screen.getByText(/Nenhum cliente encontrado/i)).toBeInTheDocument()
+  })
+
+  it('calls deleteClient when trash icon is clicked and confirmed', () => {
+    // Mock window.confirm
+    const confirmSpy = vi.spyOn(window, 'confirm').mockImplementation(() => true)
+    
+    render(<ClientsTable clients={mockClients} />)
+    
+    // Find trash buttons (one for desktop, one for mobile per client)
+    const deleteButtons = screen.getAllByRole('button').filter(btn => btn.querySelector('svg.lucide-trash2'))
+    
+    // Click the first one (John Doe desktop)
+    fireEvent.click(deleteButtons[0])
+    
+    expect(confirmSpy).toHaveBeenCalled()
+    expect(mockMutate).toHaveBeenCalledWith(1)
+    
+    confirmSpy.mockRestore()
+  })
+
+  it('does not call deleteClient when trash icon is clicked but cancelled', () => {
+    // Mock window.confirm
+    const confirmSpy = vi.spyOn(window, 'confirm').mockImplementation(() => false)
+    
+    render(<ClientsTable clients={mockClients} />)
+    
+    const deleteButtons = screen.getAllByRole('button').filter(btn => btn.querySelector('svg.lucide-trash2'))
+    
+    fireEvent.click(deleteButtons[0])
+    
+    expect(confirmSpy).toHaveBeenCalled()
+    expect(mockMutate).not.toHaveBeenCalled()
+    
+    confirmSpy.mockRestore()
   })
 })

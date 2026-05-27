@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react'
-import { useClients, useCreateClient } from './useClients'
+import { useClients, useCreateClient, useDeleteClient } from './useClients'
 import { expect, test, beforeEach, describe, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useClientStore } from '@/store/useClientStore'
@@ -9,6 +9,7 @@ import * as api from '@/lib/api'
 vi.mock('@/lib/api', () => ({
   getClients: vi.fn(),
   createClient: vi.fn(),
+  deleteClient: vi.fn(),
 }))
 
 const createTestQueryClient = () => new QueryClient({
@@ -58,5 +59,21 @@ describe('useClients hooks', () => {
     
     const clients = useClientStore.getState().clients
     expect(clients).toContainEqual(createdClient)
+  })
+
+  test('useDeleteClient removes a client', async () => {
+    const clientToDelete = { id: 1, name: 'To Be Deleted' }
+    useClientStore.setState({ clients: [clientToDelete] })
+    vi.mocked(api.deleteClient).mockResolvedValue(undefined)
+
+    const { result } = renderHook(() => useDeleteClient(), { wrapper })
+    
+    result.current.mutate(1)
+    
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    
+    const clients = useClientStore.getState().clients
+    expect(clients).toHaveLength(0)
+    expect(api.deleteClient).toHaveBeenCalledWith(1)
   })
 })

@@ -2,13 +2,27 @@
 
 import React from 'react'
 import { Client } from '@/store/useClientStore'
-import { User, Mail, Phone, MapPin } from 'lucide-react'
+import { User, Mail, Phone, MapPin, Trash2 } from 'lucide-react'
+import { useDeleteClient } from '@/hooks/useClients'
+import { Button } from '@/components/ui/button'
 
 interface ClientsTableProps {
   clients: Client[]
 }
 
-const ClientRow = React.memo(function ClientRow({ client }: { client: Client }) {
+const ClientRow = React.memo(function ClientRow({ 
+  client, 
+  onDelete 
+}: { 
+  client: Client
+  onDelete: (id: number) => void
+}) {
+  const handleDelete = () => {
+    if (confirm(`Tem certeza que deseja excluir o cliente "${client.name}"?`)) {
+      onDelete(client.id)
+    }
+  }
+
   return (
     <tr key={client.id} className="border-b border-border hover:bg-muted/30 transition-colors">
       <td className="p-4">
@@ -43,13 +57,19 @@ const ClientRow = React.memo(function ClientRow({ client }: { client: Client }) 
         )}
       </td>
       <td className="p-4 text-right">
-        <span className="text-xs text-muted-foreground italic">Visualizar</span>
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" size="icon" onClick={handleDelete} className="text-destructive hover:text-destructive hover:bg-destructive/10">
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       </td>
     </tr>
   )
 })
 
 export function ClientsTable({ clients }: ClientsTableProps) {
+  const { mutate: deleteClient } = useDeleteClient()
+
   if (clients.length === 0) {
     return (
       <div className="p-12 text-center text-muted-foreground bg-card rounded-xl border border-border shadow-sm">
@@ -73,7 +93,7 @@ export function ClientsTable({ clients }: ClientsTableProps) {
           </thead>
           <tbody>
             {clients.map((client) => (
-              <ClientRow key={client.id} client={client} />
+              <ClientRow key={client.id} client={client} onDelete={(id) => deleteClient(id)} />
             ))}
           </tbody>
         </table>
@@ -91,6 +111,18 @@ export function ClientsTable({ clients }: ClientsTableProps) {
                   ID: {client.id}
                 </div>
               </div>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => {
+                  if (confirm(`Tem certeza que deseja excluir o cliente "${client.name}"?`)) {
+                    deleteClient(client.id)
+                  }
+                }} 
+                className="text-destructive hover:text-destructive hover:bg-destructive/10 -mt-2 -mr-2"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
 
             <div className="grid grid-cols-1 gap-3 pt-2">
