@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { FileText, Loader2, Lock, Eye, EyeOff, CheckCircle2, AlertTriangle } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
@@ -84,16 +84,19 @@ function ResetPasswordForm() {
           O link de recuperação que você utilizou é inválido ou está incompleto.
         </p>
         <div className="mt-10">
-          <Button asChild className="w-full" variant="outline">
-            <Link href="/forgot-password">Solicitar novo link</Link>
-          </Button>
+          <Link 
+            href="/forgot-password" 
+            className={buttonVariants({ variant: "outline", className: "w-full" })}
+          >
+            Solicitar novo link
+          </Link>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="mx-auto w-full max-w-sm lg:w-96 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-left-4 duration-700">
+    <div className="mx-auto w-full max-sm lg:w-96 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-left-4 duration-700">
       <div className="mb-10 flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
           <FileText className="h-6 w-6 text-primary-foreground" />
@@ -180,9 +183,12 @@ function ResetPasswordForm() {
             Sua senha foi redefinida com sucesso. Você já pode entrar com sua nova senha.
           </p>
           <div className="mt-10">
-            <Button asChild className="w-full">
-              <Link href="/login">Ir para o login</Link>
-            </Button>
+            <Link 
+              href="/login" 
+              className={buttonVariants({ className: "w-full" })}
+            >
+              Ir para o login
+            </Link>
           </div>
         </div>
       )}
