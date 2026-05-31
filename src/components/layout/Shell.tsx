@@ -48,7 +48,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     // Basic auth check
-    if (isMounted && !isAuthenticated && pathname !== '/login') {
+    const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password']
+    const isPublicPage = publicRoutes.includes(pathname)
+    if (isMounted && !isAuthenticated && !isPublicPage) {
       router.push('/login')
     }
   }, [isAuthenticated, pathname, router, isMounted])
@@ -113,7 +115,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
     </>
   )
 
-  if (pathname === '/login') {
+  if (pathname === '/login' || pathname === '/register' || pathname === '/forgot-password' || pathname === '/reset-password') {
     return <>{children}</>
   }
 

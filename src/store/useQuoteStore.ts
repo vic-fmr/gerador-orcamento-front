@@ -31,6 +31,7 @@ interface QuoteState {
     approved: { value: number; count: number }
     paid: { value: number; count: number }
   }
+  reset: () => void
 }
 
 export const useQuoteStore = create<QuoteState>((set, get) => ({
@@ -70,4 +71,5 @@ export const useQuoteStore = create<QuoteState>((set, get) => ({
       }
     )
   },
+  reset: () => set({ quotes: [] }),
 }))

@@ -1,6 +1,7 @@
 'use client'
 
-import React from 'react'
+import { useState } from 'react'
+import Link from 'next/link'
 import Image from 'next/image' // Importação adicionada
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
@@ -25,9 +26,9 @@ type LoginFormValues = z.infer<typeof loginSchema>
 export default function LoginPage() {
   const router = useRouter()
   const login = useAuthStore((state) => state.login)
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [showPassword, setShowPassword] = React.useState(false)
-  const [error, setError] = React.useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const {
     register,
@@ -128,9 +129,9 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Senha</Label>
-                  <a href="#" className="text-xs font-medium text-primary hover:underline">
+                  <Link href="/forgot-password" className="text-xs font-medium text-primary hover:underline">
                     Esqueceu a senha?
-                  </a>
+                  </Link>
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-2 h-4 w-4 text-muted-foreground" />
@@ -165,24 +166,12 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            {/* <div className="mt-8">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                  <div className="w-full border-t border-border" />
-                </div>
-                <div className="relative flex justify-center text-sm font-medium leading-6">
-                  <span className="bg-background px-4 text-muted-foreground">
-                    Novo por aqui?
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <Button variant="outline" className="w-full" type="button">
-                  Solicitar Acesso
-                </Button>
-              </div>
-            </div> */}
+            <div className="mt-8 text-center text-sm">
+              <span className="text-muted-foreground">Novo por aqui? </span>
+              <a href="/register" className="font-medium text-primary hover:underline">
+                Crie sua conta
+              </a>
+            </div>
           </div>
         </div>
 

@@ -22,6 +22,7 @@ interface ServiceState {
   addItem: (service: ServiceItem) => void
   updateItem: (id: number, updates: Partial<ServiceItem>) => void
   removeItem: (id: number) => void
+  reset: () => void
 }
 
 export const defaultServices: ServiceItem[] = []
@@ -54,4 +55,5 @@ export const useServiceStore = create<ServiceState>((set) => ({
     services: state.services.filter((service) => service.id !== id),
     items: state.items.filter((service) => service.id !== id),
   })),
+  reset: () => set({ services: [], items: [] }),
 }))

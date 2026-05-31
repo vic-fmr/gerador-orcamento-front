@@ -97,12 +97,23 @@ export interface Quote {
 
 // Auth API
 export async function login(data: { email: string; password: string }): Promise<string> {
-  // Assuming the backend returns the token directly as a string or in an object { token: "..." }
-  // If it returns only the token string, the apiPost might need adjustment if it expects JSON object
-  // But usually it's an object. Let's assume the apiPost handles it.
   const response = await apiPost<{ token?: string } | string>('/api/auth/login', data)
   if (typeof response === 'string') return response
   return response.token || ''
+}
+
+export async function register(data: { name: string; email: string; password: string; phone?: string }): Promise<string> {
+  const response = await apiPost<{ token?: string } | string>('/api/auth/register', data)
+  if (typeof response === 'string') return response
+  return response.token || ''
+}
+
+export async function forgotPassword(data: { email: string }): Promise<void> {
+  return apiPost<void>('/api/auth/forgot-password', data)
+}
+
+export async function resetPassword(data: { token: string; password: string }): Promise<void> {
+  return apiPost<void>('/api/auth/reset-password', data)
 }
 
 // Clients API

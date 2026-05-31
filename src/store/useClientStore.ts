@@ -15,6 +15,7 @@ interface ClientState {
   addClient: (client: Client) => void
   updateClient: (id: number, updates: Partial<Client>) => void
   removeClient: (id: number) => void
+  reset: () => void
 }
 
 export const useClientStore = create<ClientState>((set) => ({
@@ -29,4 +30,5 @@ export const useClientStore = create<ClientState>((set) => ({
   removeClient: (id) => set((state) => ({
     clients: state.clients.filter((c) => c.id !== id)
   })),
+  reset: () => set({ clients: [] }),
 }))

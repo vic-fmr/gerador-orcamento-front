@@ -3,7 +3,9 @@
  * Centralizes fetch logic, error handling, and base URL management
  */
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api'
+const baseUrl = process.env.NODE_ENV === 'development' 
+  ? '' 
+  : (process.env.NEXT_PUBLIC_API_BASE_URL || '')
 
 function getHeaders(): Record<string, string> {
   const headers: Record<string, string> = {
