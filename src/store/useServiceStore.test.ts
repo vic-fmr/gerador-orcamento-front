@@ -19,16 +19,16 @@ describe('useServiceStore', () => {
 
   it('adds, updates and removes a service', () => {
     useServiceStore.getState().addService({
-      id: 'srv-new',
+      id: 999,
       name: 'Teste Serviço',
       description: 'Descrição de teste',
       unit: 'un',
       defaultUnitPrice: 10,
     })
 
-    expect(useServiceStore.getState().services[0].id).toBe('srv-new')
+    expect(useServiceStore.getState().services[0].id).toBe(999)
 
-    useServiceStore.getState().updateService('srv-new', {
+    useServiceStore.getState().updateService(999, {
       name: 'Serviço Atualizado',
       defaultUnitPrice: 12,
     })
@@ -36,8 +36,8 @@ describe('useServiceStore', () => {
     expect(useServiceStore.getState().services[0].name).toBe('Serviço Atualizado')
     expect(useServiceStore.getState().items[0].defaultUnitPrice).toBe(12)
 
-    useServiceStore.getState().removeService('srv-new')
+    useServiceStore.getState().removeService(999)
 
-    expect(useServiceStore.getState().services.find((service) => service.id === 'srv-new')).toBeUndefined()
+    expect(useServiceStore.getState().services.find((service) => service.id === 999)).toBeUndefined()
   })
 })

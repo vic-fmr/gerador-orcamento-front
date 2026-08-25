@@ -4,6 +4,7 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
+import { AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -21,9 +22,10 @@ export type ClientFormValues = z.infer<typeof clientSchema>
 interface ClientFormProps {
   onSubmit: (data: ClientFormValues) => void
   isSubmitting?: boolean
+  errorMessage?: string | null
 }
 
-export function ClientForm({ onSubmit, isSubmitting }: ClientFormProps) {
+export function ClientForm({ onSubmit, isSubmitting, errorMessage }: ClientFormProps) {
   const {
     register,
     handleSubmit,
@@ -41,6 +43,16 @@ export function ClientForm({ onSubmit, isSubmitting }: ClientFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {errorMessage && (
+        <div
+          role="alert"
+          className="flex items-start gap-2.5 rounded-lg bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive animate-in fade-in slide-in-from-top-1 duration-200"
+        >
+          <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+          <span className="leading-snug">{errorMessage}</span>
+        </div>
+      )}
+
       <div className="space-y-2">
         <Label htmlFor="name">Nome</Label>
         <Input id="name" {...register('name')} />

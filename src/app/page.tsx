@@ -7,8 +7,6 @@ import {
   Clock,
   CheckCircle2,
   CreditCard,
-  ArrowUpRight,
-  TrendingUp,
   FileText as LucideFileText,
   Trash2
 } from 'lucide-react'
@@ -27,9 +25,11 @@ import { useClientStore } from '@/store/useClientStore'
 import { resolveEstimateClient } from '@/lib/estimate-document'
 import { useClients } from '@/hooks/useClients'
 import { getQuoteStatusBucket, getQuoteStatusLabel } from '@/lib/api'
+import { ErrorState } from '@/components/ui/error-state'
+import { getErrorMessage } from '@/lib/api-client'
 
 export default function Home() {
-  const { data: quotes = [], isLoading } = useQuotes()
+  const { data: quotes = [], isLoading, isError, error, refetch, isFetching } = useQuotes()
   const deleteQuote = useDeleteQuote()
   useClients()
   const clients = useClientStore((state) => state.clients)
@@ -105,7 +105,7 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Main Grid for recent activity or charts */}
+      {/* Main Grid for recent activity */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-7 shadow-sm border-none bg-secondary/5">
           <CardHeader>
@@ -122,6 +122,13 @@ export default function Home() {
                     <div key={i} className="h-16 w-full animate-pulse bg-muted rounded-lg" />
                   ))}
                 </div>
+              ) : isError ? (
+                <ErrorState
+                  title="Erro ao carregar orçamentos recentes"
+                  message={getErrorMessage(error, 'Não foi possível obter os dados do painel.')}
+                  onRetry={() => refetch()}
+                  isRetrying={isFetching}
+                />
               ) : (
                 <>
                   {quotes.slice(0, 5).map((quote) => (
@@ -176,30 +183,7 @@ export default function Home() {
             </div>
           </CardContent>
         </Card>
-
-        {/* 
-        Inativo - Dashboard de crescimento de receita - pode ser reativado futuramente
-        <Card className="col-span-3 shadow-sm border-none bg-primary text-primary-foreground">
-           <CardHeader>
-             <CardTitle className="flex items-center justify-between">
-               Crescimento de Receita
-               <TrendingUp className="h-5 w-5" />
-             </CardTitle>
-           </CardHeader>
-           <CardContent>
-              <div className="text-4xl font-bold mb-2">+12.5%</div>
-              <p className="text-primary-foreground/80 text-sm mb-6">
-                Sua receita aumentou 12.5% em relação ao mês passado.
-              </p>
-              <Button variant="secondary" className="w-full font-semibold group">
-                Ver Relatórios
-                <ArrowUpRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </Button>
-           </CardContent>
-        </Card> */}
       </div>
     </div>
   )
 }
-
-

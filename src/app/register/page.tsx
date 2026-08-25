@@ -14,7 +14,7 @@ import Link from 'next/link'
 
 import { useAuthStore } from '@/store/useAuthStore'
 import { register as apiRegister } from '@/lib/api'
-import { ApiError } from '@/lib/api-client'
+import { ApiError, getErrorMessage } from '@/lib/api-client'
 
 const registerSchema = z.object({
   name: z.string().min(2, { message: "Nome deve ter pelo menos 2 caracteres" }),
@@ -81,10 +81,10 @@ export default function RegisterPage() {
         if (err.status === 409) {
           setError('Este e-mail já está em uso.')
         } else {
-          setError(`Erro no servidor: ${err.status}`)
+          setError(err.message || 'Erro ao criar conta.')
         }
       } else {
-        setError('Ocorreu um erro inesperado. Tente novamente.')
+        setError(getErrorMessage(err, 'Ocorreu um erro inesperado. Tente novamente.'))
       }
     } finally {
       setIsLoading(false)

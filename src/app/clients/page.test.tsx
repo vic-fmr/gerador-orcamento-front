@@ -1,22 +1,30 @@
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import ClientsPage from './page'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 const mockClients = [
-  { id: '1', name: 'John Doe', email: 'john@example.com' }
+  { id: 1, name: 'John Doe', email: 'john@example.com' }
 ]
 
 vi.mock('@/hooks/useClients', () => ({
   useClients: () => ({
     data: mockClients,
-    isLoading: false
+    isLoading: false,
+    isError: false,
+    error: null,
+    refetch: vi.fn(),
+    isFetching: false,
   }),
   useCreateClient: () => ({
     mutate: vi.fn(),
-    isPending: false
-  })
+    isPending: false,
+  }),
+  useDeleteClient: () => ({
+    mutate: vi.fn(),
+    isPending: false,
+  }),
 }))
 
 const queryClient = new QueryClient()

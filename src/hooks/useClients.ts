@@ -8,11 +8,12 @@ import {
   Client,
 } from '@/lib/api'
 import { useClientStore } from '@/store/useClientStore'
+import { toast } from '@/lib/toast'
 
 export function useClients() {
   const setClients = useClientStore((s) => s.setClients)
 
-  const query = useQuery({
+  const query = useQuery<Client[]>({
     queryKey: ['clients'],
     queryFn: async () => {
       return await getClients()
@@ -39,6 +40,7 @@ export function useCreateClient() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] })
+      toast.success('Cliente cadastrado com sucesso!')
     },
   })
 }
@@ -55,6 +57,7 @@ export function useUpdateClient() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] })
+      toast.success('Cliente atualizado com sucesso!')
     },
   })
 }
@@ -71,6 +74,7 @@ export function useDeleteClient() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] })
+      toast.success('Cliente excluído com sucesso!')
     },
   })
 }

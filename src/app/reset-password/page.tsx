@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 import { resetPassword } from '@/lib/api'
-import { ApiError } from '@/lib/api-client'
+import { ApiError, getErrorMessage } from '@/lib/api-client'
 
 const resetPasswordSchema = z.object({
   password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
@@ -63,10 +63,10 @@ function ResetPasswordForm() {
         if (err.status === 400) {
           setError('O link de recuperação expirou ou é inválido.')
         } else {
-          setError(`Erro no servidor: ${err.status}`)
+          setError(err.message || 'Erro ao redefinir senha.')
         }
       } else {
-        setError('Ocorreu um erro inesperado. Tente novamente.')
+        setError(getErrorMessage(err, 'Ocorreu um erro inesperado. Tente novamente.'))
       }
     } finally {
       setIsLoading(false)

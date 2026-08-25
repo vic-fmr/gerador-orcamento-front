@@ -3,8 +3,8 @@ import { persist } from 'zustand/middleware'
 import { useClientStore } from './useClientStore'
 import { useServiceStore } from './useServiceStore'
 import { useQuoteStore } from './useQuoteStore'
-
 import { queryClient } from '@/lib/query-provider'
+import { setUnauthorizedHandler } from '@/lib/api-client'
 
 interface User {
   id: string
@@ -46,3 +46,10 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 )
+
+// Register global unauthorized handler to log out when token expires
+setUnauthorizedHandler(() => {
+  if (useAuthStore.getState().isAuthenticated) {
+    useAuthStore.getState().logout()
+  }
+})

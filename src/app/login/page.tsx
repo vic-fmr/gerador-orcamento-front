@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label'
 
 import { useAuthStore } from '@/store/useAuthStore'
 import { login as apiLogin } from '@/lib/api'
-import { ApiError } from '@/lib/api-client'
+import { ApiError, getErrorMessage } from '@/lib/api-client'
 
 const loginSchema = z.object({
   email: z.string().email({ message: "E-mail inválido" }),
@@ -72,10 +72,10 @@ export default function LoginPage() {
         if (err.status === 401) {
           setError('E-mail ou senha incorretos.')
         } else {
-          setError(`Erro no servidor: ${err.status}`)
+          setError(err.message || 'Erro ao realizar login.')
         }
       } else {
-        setError('Ocorreu um erro inesperado. Tente novamente.')
+        setError(getErrorMessage(err, 'Ocorreu um erro inesperado. Tente novamente.'))
       }
     } finally {
       setIsLoading(false)

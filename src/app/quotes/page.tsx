@@ -16,9 +16,12 @@ import { useClientStore } from '@/store/useClientStore'
 import { resolveEstimateClient } from '@/lib/estimate-document'
 import { useClients } from '@/hooks/useClients'
 import { getQuoteStatusBucket, getQuoteStatusLabel, QuoteStatus } from '@/lib/api'
+import { ErrorState } from '@/components/ui/error-state'
+import { getErrorMessage } from '@/lib/api-client'
+import { toast } from '@/lib/toast'
 
 export default function QuotesHistory() {
-  const { data: quotes = [], isLoading } = useQuotes()
+  const { data: quotes = [], isLoading, isError, error, refetch, isFetching } = useQuotes()
   const { mutate: updateQuote, isPending: isUpdating } = useUpdateQuote()
   const deleteQuote = useDeleteQuote()
   useClients()
@@ -35,9 +38,15 @@ export default function QuotesHistory() {
     if (!quote) return
 
     setUpdatingId(id)
-    updateQuote({ id, updates: { ...quote, status: newStatus } }, {
-      onSettled: () => setUpdatingId(null)
-    })
+    updateQuote(
+      { id, updates: { ...quote, status: newStatus } },
+      {
+        onSettled: () => setUpdatingId(null),
+        onError: (err) => {
+          toast.error(getErrorMessage(err, 'Erro ao atualizar o status do orçamento.'))
+        },
+      }
+    )
   }
 
   const handleDelete = (quote: Quote) => {
@@ -93,6 +102,12 @@ export default function QuotesHistory() {
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Orçamentos</h2>
+          <p className="text-sm text-muted-foreground mt-1">Consulte o histórico de orçamentos, altere status ou faça downloads.</p>
+        </div>
+      </div>
 
       <div className="bg-card p-4 rounded-xl border border-border shadow-sm">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
@@ -148,6 +163,13 @@ export default function QuotesHistory() {
               <div key={i} className="h-12 w-full animate-pulse bg-muted rounded-lg" />
             ))}
           </div>
+        ) : isError ? (
+          <ErrorState
+            title="Erro ao carregar orçamentos"
+            message={getErrorMessage(error, 'Não foi possível carregar a lista de orçamentos do servidor.')}
+            onRetry={() => refetch()}
+            isRetrying={isFetching}
+          />
         ) : filteredQuotes.length === 0 ? (
           <div className="p-12 text-center text-muted-foreground">
             Nenhum orçamento encontrado com os filtros atuais.
@@ -243,6 +265,13 @@ export default function QuotesHistory() {
               <div key={i} className="h-40 w-full animate-pulse bg-muted rounded-xl border border-border" />
             ))}
           </div>
+        ) : isError ? (
+          <ErrorState
+            title="Erro ao carregar orçamentos"
+            message={getErrorMessage(error, 'Não foi possível carregar a lista de orçamentos do servidor.')}
+            onRetry={() => refetch()}
+            isRetrying={isFetching}
+          />
         ) : filteredQuotes.length === 0 ? (
           <div className="p-12 text-center text-muted-foreground bg-card rounded-xl border border-border">
             Nenhum orçamento encontrado.

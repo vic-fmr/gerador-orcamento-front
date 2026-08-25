@@ -9,9 +9,11 @@ import { useDeleteService, useServices } from '@/hooks/useServices'
 import { ServicesTable } from '@/components/services/ServicesTable'
 import { ServiceItem } from '@/store/useServiceStore'
 import { ServiceSheet } from '@/components/services/ServiceSheet'
+import { ErrorState } from '@/components/ui/error-state'
+import { getErrorMessage } from '@/lib/api-client'
 
 export default function ServicesPage() {
-  const { data: services = [], isLoading } = useServices()
+  const { data: services = [], isLoading, isError, error, refetch, isFetching } = useServices()
   const deleteService = useDeleteService()
   const [searchTerm, setSearchTerm] = React.useState('')
   const [editorOpen, setEditorOpen] = React.useState(false)
@@ -47,6 +49,12 @@ export default function ServicesPage() {
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Serviços</h2>
+          <p className="text-sm text-muted-foreground mt-1">Gerencie o catálogo de serviços para compor orçamentos rapidamente.</p>
+        </div>
+      </div>
 
       <div className="bg-card p-4 rounded-xl border border-border shadow-sm">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
@@ -76,6 +84,13 @@ export default function ServicesPage() {
         <div className="flex justify-center p-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
+      ) : isError ? (
+        <ErrorState
+          title="Erro ao carregar serviços"
+          message={getErrorMessage(error, 'Não foi possível obter a lista de serviços do servidor.')}
+          onRetry={() => refetch()}
+          isRetrying={isFetching}
+        />
       ) : (
         <ServicesTable services={filteredServices} onEdit={handleEdit} onDelete={handleDelete} />
       )}

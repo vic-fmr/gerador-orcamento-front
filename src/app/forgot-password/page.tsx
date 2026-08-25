@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 import { forgotPassword } from '@/lib/api'
-import { ApiError } from '@/lib/api-client'
+import { ApiError, getErrorMessage } from '@/lib/api-client'
 
 const forgotPasswordSchema = z.object({
   email: z.string().email({ message: "E-mail inválido" }),
@@ -51,10 +51,10 @@ export default function ForgotPasswordPage() {
           // but if the backend returns 404, we can handle it or show the same success message.
           setIsSubmitted(true)
         } else {
-          setError(`Erro no servidor: ${err.status}`)
+          setError(err.message || 'Erro ao enviar e-mail de recuperação.')
         }
       } else {
-        setError('Ocorreu um erro inesperado. Tente novamente.')
+        setError(getErrorMessage(err, 'Ocorreu um erro inesperado. Tente novamente.'))
       }
     } finally {
       setIsLoading(false)

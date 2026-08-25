@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import { Shell } from "@/components/layout/Shell";
 import { QueryProvider } from "@/lib/query-provider";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <QueryProvider>
           <Shell>{children}</Shell>
+          <Toaster />
         </QueryProvider>
       </body>
     </html>

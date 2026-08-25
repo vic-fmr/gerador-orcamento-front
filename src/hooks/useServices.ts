@@ -8,6 +8,7 @@ import {
   ServiceItem,
 } from '@/lib/api'
 import { useServiceStore } from '@/store/useServiceStore'
+import { toast } from '@/lib/toast'
 
 export function useServices() {
   const setServices = useServiceStore((s) => s.setServices)
@@ -39,6 +40,7 @@ export function useCreateService() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] })
+      toast.success('Serviço cadastrado com sucesso!')
     },
   })
 }
@@ -55,6 +57,7 @@ export function useUpdateService() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] })
+      toast.success('Serviço atualizado com sucesso!')
     },
   })
 }
@@ -71,6 +74,7 @@ export function useDeleteService() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] })
+      toast.success('Serviço excluído com sucesso!')
     },
   })
 }

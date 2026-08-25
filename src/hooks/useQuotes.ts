@@ -9,6 +9,7 @@ import {
   normalizeQuoteStatus,
 } from '@/lib/api'
 import { useQuoteStore } from '@/store/useQuoteStore'
+import { toast } from '@/lib/toast'
 
 function normalizeAmount(value: unknown) {
   if (typeof value === 'number') {
@@ -90,7 +91,7 @@ export function useQuotes() {
   const setQuotes = useQuoteStore((state) => state.setQuotes)
   const storeQuotes = useQuoteStore((state) => state.quotes)
 
-  const query = useQuery({
+  const query = useQuery<Quote[]>({
     queryKey: ['quotes'],
     queryFn: async () => {
       const quotes = await getQuotes()
@@ -170,6 +171,7 @@ export function useCreateQuote() {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] })
+      toast.success('Orçamento criado com sucesso!')
     },
   })
 }
@@ -180,10 +182,6 @@ export function useUpdateQuote() {
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: number; updates: Partial<Quote> }) => {
-      // If we are doing a partial update from the UI, we might need to fetch the current state
-      // or assume the caller provides enough data. 
-      // For the status change feature, we'll ensure the caller passes the full quote or we merge it.
-      
       const mappedItems = updates.items ? updates.items.map((it) => ({
         description: it.description,
         quantity: it.quantity,
@@ -212,6 +210,7 @@ export function useUpdateQuote() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] })
+      toast.success('Orçamento atualizado com sucesso!')
     },
   })
 }
@@ -228,6 +227,7 @@ export function useDeleteQuote() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] })
+      toast.success('Orçamento excluído com sucesso!')
     },
   })
 }

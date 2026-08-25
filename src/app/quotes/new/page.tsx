@@ -2,24 +2,23 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller, Path } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { ArrowLeft, Save, Eye } from 'lucide-react'
+import { ArrowLeft, Save, Download, FileEdit, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Quote } from '@/store/useQuoteStore'
 import Link from 'next/link'
 import { LineItemsEditor } from '@/components/estimates/LineItemsEditor'
-import { Controller, Path } from 'react-hook-form'
 import { useCreateQuote } from '@/hooks/useQuotes'
 import { ClientSelect } from '@/components/estimates/ClientSelect'
 import { useClientStore } from '@/store/useClientStore'
 import { generateQuotePDF } from '@/lib/pdf-export'
 import { generateQuoteDOCX } from '@/lib/docx-export'
 import { resolveEstimateClient } from '@/lib/estimate-document'
-import { Download, FileEdit } from 'lucide-react'
+import { getErrorMessage } from '@/lib/api-client'
 
 const quoteSchema = z.object({
   title: z.string().min(3, 'O título deve ter pelo menos 3 caracteres'),
@@ -38,6 +37,7 @@ type QuoteFormValues = z.infer<typeof quoteSchema>
 export function NewQuotePage() {
   const router = useRouter()
   const [step, setStep] = React.useState(1)
+  const [saveError, setSaveError] = React.useState<string | null>(null)
   const createQuote = useCreateQuote()
 
   const {
@@ -65,6 +65,7 @@ export function NewQuotePage() {
       return
     }
 
+    setSaveError(null)
     const totalAmount = data.items.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0)
 
     const newQuote = {
@@ -78,13 +79,18 @@ export function NewQuotePage() {
 
     createQuote.mutate(newQuote, {
       onSuccess: () => {
+        setSaveError(null)
         router.push('/')
-      }
+      },
+      onError: (error) => {
+        setSaveError(getErrorMessage(error, 'Erro ao salvar o orçamento. Tente novamente.'))
+      },
     })
   }
 
   const nextStep = async (e?: React.MouseEvent) => {
     if (e) e.preventDefault()
+    setSaveError(null)
     const fieldsToValidate: Path<QuoteFormValues>[] = step === 1 ? ['title', 'client'] : ['items']
     const result = await trigger(fieldsToValidate)
     if (result) setStep(step + 1)
@@ -92,6 +98,7 @@ export function NewQuotePage() {
 
   const prevStep = (e: React.MouseEvent) => {
     e.preventDefault()
+    setSaveError(null)
     setStep(step - 1)
   }
 
@@ -142,6 +149,19 @@ export function NewQuotePage() {
           <span className={step === 3 ? 'text-primary font-bold' : ''}>3. Revisão</span>
         </div>
       </div>
+
+      {saveError && (
+        <div
+          role="alert"
+          className="flex items-start gap-2.5 rounded-lg bg-destructive/10 border border-destructive/20 p-4 text-sm text-destructive animate-in fade-in duration-200"
+        >
+          <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+          <div>
+            <p className="font-semibold">Erro ao salvar</p>
+            <p className="mt-0.5 leading-snug">{saveError}</p>
+          </div>
+        </div>
+      )}
 
       <form
         onSubmit={step === 3 ? handleSubmit(onSubmit) : (e) => e.preventDefault()}
@@ -303,7 +323,7 @@ export function NewQuotePage() {
                 </Button>
                 <Button type="submit" disabled={createQuote.isPending} className="bg-primary hover:bg-primary/90 flex-1 sm:flex-initial h-11 sm:h-9">
                   <Save className="mr-2 h-4 w-4" />
-                  Salvar Orçamento
+                  {createQuote.isPending ? 'Salvando...' : 'Salvar Orçamento'}
                 </Button>
               </>
             )}

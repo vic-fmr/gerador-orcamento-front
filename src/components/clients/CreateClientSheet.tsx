@@ -14,6 +14,7 @@ import {
 import { ClientForm, ClientFormValues } from './ClientForm'
 import { useCreateClient } from '@/hooks/useClients'
 import { Client } from '@/lib/api'
+import { getErrorMessage } from '@/lib/api-client'
 
 interface CreateClientSheetProps {
   open?: boolean
@@ -24,11 +25,15 @@ interface CreateClientSheetProps {
 
 export function CreateClientSheet({ open, onOpenChange, trigger, onSuccess }: CreateClientSheetProps) {
   const [internalOpen, setInternalOpen] = useState(false)
+  const [serverError, setServerError] = useState<string | null>(null)
   const createClient = useCreateClient()
   const isControlled = typeof open === 'boolean'
   const sheetOpen = isControlled ? open : internalOpen
 
   const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      setServerError(null)
+    }
     if (!isControlled) {
       setInternalOpen(nextOpen)
     }
@@ -36,12 +41,17 @@ export function CreateClientSheet({ open, onOpenChange, trigger, onSuccess }: Cr
   }
 
   const handleSubmit = (data: ClientFormValues) => {
+    setServerError(null)
     createClient.mutate(
       data,
       {
         onSuccess: (createdClient) => {
+          setServerError(null)
           onSuccess?.(createdClient)
           handleOpenChange(false)
+        },
+        onError: (error) => {
+          setServerError(getErrorMessage(error, 'Erro ao criar cliente. Verifique os dados e tente novamente.'))
         },
       }
     )
@@ -52,14 +62,16 @@ export function CreateClientSheet({ open, onOpenChange, trigger, onSuccess }: Cr
       {trigger !== null && (
         <SheetTrigger
           render={
-            trigger ?? <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Novo Cliente
-            </Button>
+            trigger ?? (
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Novo Cliente
+              </Button>
+            )
           }
         />
       )}
-      <SheetContent className="w-full p-2 sm:max-w-md overflow-y-auto lg:px-6 ">
+      <SheetContent className="w-full p-2 sm:max-w-md overflow-y-auto lg:px-6">
         <SheetHeader className="mb-6">
           <SheetTitle>Adicionar Novo Cliente</SheetTitle>
           <SheetDescription>
@@ -69,6 +81,7 @@ export function CreateClientSheet({ open, onOpenChange, trigger, onSuccess }: Cr
         <ClientForm
           onSubmit={handleSubmit}
           isSubmitting={createClient.isPending}
+          errorMessage={serverError}
         />
       </SheetContent>
     </Sheet>

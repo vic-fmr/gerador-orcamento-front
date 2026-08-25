@@ -25,11 +25,19 @@ interface ServiceState {
   reset: () => void
 }
 
-export const defaultServices: ServiceItem[] = []
+export const defaultServices: ServiceItem[] = [
+  {
+    id: 1,
+    name: 'Pintura de Parede (Látex)',
+    description: 'Aplicação de pintura interna',
+    unit: 'm²',
+    defaultUnitPrice: 45,
+  },
+]
 
 export const useServiceStore = create<ServiceState>((set) => ({
-  services: [],
-  items: [],
+  services: defaultServices,
+  items: defaultServices,
   setServices: (services) => set(() => ({ services, items: services })),
   addService: (service) => set((state) => ({
     services: [service, ...state.services],
