@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     const isDev = process.env.NODE_ENV === 'development';
     const backendUrl = isDev 
       ? 'http://localhost:8080' 
-      : (process.env.NEXT_PUBLIC_API_BASE_URL || '');
+      : (process.env.API_BASE_URL || '');
 
     return [
       {
