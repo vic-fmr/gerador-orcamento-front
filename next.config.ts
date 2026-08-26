@@ -2,15 +2,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   async rewrites() {
-    const isDev = process.env.NODE_ENV === 'development';
-    const backendUrl = isDev 
-      ? 'http://localhost:8080' 
-      : (process.env.API_BASE_URL || '');
+    const backendUrl = process.env.API_BASE_URL || 'http://localhost:8080';
+    const cleanBackendUrl = backendUrl.replace(/\/api\/?$/, '').replace(/\/$/, '');
 
     return [
       {
         source: '/api/:path*',
-        destination: `${backendUrl}/api/:path*`,
+        destination: `${cleanBackendUrl}/api/:path*`,
       },
     ];
   },

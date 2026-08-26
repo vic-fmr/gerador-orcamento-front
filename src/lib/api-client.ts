@@ -3,9 +3,7 @@
  * Centralizes fetch logic, intelligent error extraction, and base URL management
  */
 
-const baseUrl = process.env.NODE_ENV === 'development' 
-  ? '' 
-  : (process.env.API_BASE_URL || '')
+const baseUrl = ''
 
 type UnauthorizedHandler = () => void
 let unauthorizedHandler: UnauthorizedHandler | null = null

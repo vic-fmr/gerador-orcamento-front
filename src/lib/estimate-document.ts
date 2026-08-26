@@ -3,11 +3,13 @@ import { Client } from '@/store/useClientStore'
 export const COMPANY_INFO = {
   name: 'WM Engenharia',
   cnpj: '47711488000129',
-  engineer: 'Eng Macerlo Marques de Morais',
+  engineer: 'Eng Marcelo Marques de Morais',
 }
 
-export const DOCUMENT_PRIMARY_COLOR = '006699'
-export const DOCUMENT_PRIMARY_COLOR_RGB: [number, number, number] = [0, 102, 153]
+export const DOCUMENT_PRIMARY_COLOR = '1A365D'
+export const DOCUMENT_PRIMARY_COLOR_RGB: [number, number, number] = [26, 54, 93]
+export const DOCUMENT_SECONDARY_COLOR = '2B6CB0'
+export const DOCUMENT_SECONDARY_COLOR_RGB: [number, number, number] = [43, 108, 176]
 
 export interface EstimateClientInfo {
   name: string

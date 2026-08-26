@@ -85,6 +85,9 @@ export interface LineItem {
   serviceId?: string | number
 }
 
+export type { ScheduleItem, QuoteTechnicalProposal } from '@/store/useQuoteStore'
+export { DEFAULT_PROPOSAL_DETAILS } from '@/store/useQuoteStore'
+
 export interface Quote {
   id: number
   title: string
@@ -93,6 +96,7 @@ export interface Quote {
   status: QuoteStatus
   date: string
   items: LineItem[]
+  proposalDetails?: import('@/store/useQuoteStore').QuoteTechnicalProposal
 }
 
 // Auth API

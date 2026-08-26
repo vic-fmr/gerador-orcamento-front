@@ -9,9 +9,8 @@ import { ArrowLeft, Save, Download, FileEdit, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Quote } from '@/store/useQuoteStore'
+import { Quote, DEFAULT_PROPOSAL_DETAILS } from '@/store/useQuoteStore'
 import Link from 'next/link'
-import { LineItemsEditor } from '@/components/estimates/LineItemsEditor'
 import { useCreateQuote } from '@/hooks/useQuotes'
 import { ClientSelect } from '@/components/estimates/ClientSelect'
 import { useClientStore } from '@/store/useClientStore'
@@ -19,6 +18,7 @@ import { generateQuotePDF } from '@/lib/pdf-export'
 import { generateQuoteDOCX } from '@/lib/docx-export'
 import { resolveEstimateClient } from '@/lib/estimate-document'
 import { getErrorMessage } from '@/lib/api-client'
+import { ProposalDetailsEditor } from '@/components/estimates/ProposalDetailsEditor'
 
 const quoteSchema = z.object({
   title: z.string().min(3, 'O título deve ter pelo menos 3 caracteres'),
@@ -30,6 +30,21 @@ const quoteSchema = z.object({
     unitPrice: z.number().min(0),
     unit: z.string(),
   })).min(1, 'Adicione pelo menos um item'),
+  proposalDetails: z.object({
+    workLocation: z.string().optional(),
+    serviceSummary: z.string().optional(),
+    executionDeadline: z.string().optional(),
+    taxRegime: z.string().optional(),
+    invoicing: z.string().optional(),
+    scopeIntro: z.string().optional(),
+    scopeItems: z.array(z.string()).optional(),
+    schedule: z.array(z.object({
+      period: z.string(),
+      activities: z.string(),
+    })).optional(),
+    fiscalBenefitNote: z.string().optional(),
+    conditions: z.array(z.string()).optional(),
+  }).optional(),
 })
 
 type QuoteFormValues = z.infer<typeof quoteSchema>
@@ -52,12 +67,14 @@ export function NewQuotePage() {
     defaultValues: {
       items: [],
       client: 0,
+      proposalDetails: DEFAULT_PROPOSAL_DETAILS,
     },
   })
 
   const items = watch('items')
   const title = watch('title')
   const clientId = watch('client')
+  const proposalDetails = watch('proposalDetails') || DEFAULT_PROPOSAL_DETAILS
 
   const onSubmit = (data: QuoteFormValues) => {
     if (step < 3) {
@@ -75,6 +92,7 @@ export function NewQuotePage() {
       status: 'DRAFT' as const,
       date: new Date().toISOString(),
       items: data.items,
+      proposalDetails: data.proposalDetails || DEFAULT_PROPOSAL_DETAILS,
     }
 
     createQuote.mutate(newQuote, {
@@ -102,7 +120,7 @@ export function NewQuotePage() {
     setStep(step - 1)
   }
 
-  const totalAmount = items.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0)
+  const totalAmount = (items || []).reduce((acc, item) => acc + item.quantity * item.unitPrice, 0)
 
   const clients = useClientStore((s) => s.clients)
   const clientData = clients.find((c) => c.id === clientId)
@@ -115,7 +133,8 @@ export function NewQuotePage() {
     amount: totalAmount,
     status: 'DRAFT' as const,
     date: new Date().toISOString(),
-    items: items,
+    items: items || [],
+    proposalDetails: proposalDetails,
   }
 
   const handleExportPDF = (e: React.MouseEvent) => {
@@ -144,7 +163,7 @@ export function NewQuotePage() {
         <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
           <span className={step === 1 ? 'text-primary font-bold' : ''}>1. Detalhes</span>
           <span className="w-4 h-px bg-border"></span>
-          <span className={step === 2 ? 'text-primary font-bold' : ''}>2. Itens</span>
+          <span className={step === 2 ? 'text-primary font-bold' : ''}>2. Itens & Detalhes</span>
           <span className="w-4 h-px bg-border"></span>
           <span className={step === 3 ? 'text-primary font-bold' : ''}>3. Revisão</span>
         </div>
@@ -167,7 +186,7 @@ export function NewQuotePage() {
         onSubmit={step === 3 ? handleSubmit(onSubmit) : (e) => e.preventDefault()}
         className="space-y-8 bg-card p-6 rounded-xl shadow-sm border border-border"
         onKeyDown={(e) => {
-          if (e.key === 'Enter' && step < 3) {
+          if (e.key === 'Enter' && step < 3 && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
             e.preventDefault()
             nextStep()
           }
@@ -179,7 +198,7 @@ export function NewQuotePage() {
               <Label htmlFor="title">Título do Projeto</Label>
               <Input
                 id="title"
-                placeholder="Ex: Reforma de Cozinha"
+                placeholder="Ex: Reforma de Fachada Comercial"
                 {...register('title')}
               />
               {errors.title && (
@@ -212,10 +231,18 @@ export function NewQuotePage() {
             <Controller
               control={control}
               name="items"
-              render={({ field }) => (
-                <LineItemsEditor
-                  items={field.value}
-                  onChange={field.onChange}
+              render={({ field: itemsField }) => (
+                <Controller
+                  control={control}
+                  name="proposalDetails"
+                  render={({ field: detailsField }) => (
+                    <ProposalDetailsEditor
+                      items={itemsField.value || []}
+                      onChangeItems={itemsField.onChange}
+                      proposalDetails={detailsField.value || DEFAULT_PROPOSAL_DETAILS}
+                      onChangeProposalDetails={detailsField.onChange}
+                    />
+                  )}
                 />
               )}
             />
@@ -231,7 +258,7 @@ export function NewQuotePage() {
               <h3 className="text-lg font-semibold">Resumo do Orçamento</h3>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg">
               <div>
                 <Label className="text-muted-foreground">Projeto</Label>
                 <p className="font-semibold text-lg">{title}</p>
@@ -239,6 +266,14 @@ export function NewQuotePage() {
               <div>
                 <Label className="text-muted-foreground">Cliente</Label>
                 <p className="font-semibold text-lg">{clientNameForPreview}</p>
+              </div>
+              <div>
+                <Label className="text-muted-foreground">Prazo de Execução</Label>
+                <p className="font-semibold text-sm">{proposalDetails.executionDeadline || '25 a 30 dias úteis'}</p>
+              </div>
+              <div>
+                <Label className="text-muted-foreground">Local da Obra</Label>
+                <p className="font-semibold text-sm">{proposalDetails.workLocation || 'Fachada Principal'}</p>
               </div>
             </div>
 
@@ -255,7 +290,7 @@ export function NewQuotePage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {items.map((item) => (
+                    {(items || []).map((item) => (
                       <tr key={item.id} className="border-t border-border">
                         <td className="p-2">{item.description}</td>
                         <td className="p-2 text-right">{item.quantity}</td>
