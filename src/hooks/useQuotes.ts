@@ -5,8 +5,10 @@ import {
   createQuote as apiCreateQuote,
   updateQuote as apiUpdateQuote,
   deleteQuote as apiDeleteQuote,
+  generateQuoteFromAI as apiGenerateQuoteFromAI,
   Quote,
   normalizeQuoteStatus,
+  AIGeneratedQuoteResponse,
 } from '@/lib/api'
 import { useQuoteStore } from '@/store/useQuoteStore'
 import { toast } from '@/lib/toast'
@@ -228,6 +230,14 @@ export function useDeleteQuote() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] })
       toast.success('Orçamento excluído com sucesso!')
+    },
+  })
+}
+
+export function useGenerateQuoteAI() {
+  return useMutation({
+    mutationFn: async ({ prompt, clientId }: { prompt: string; clientId?: number }) => {
+      return apiGenerateQuoteFromAI(prompt, clientId)
     },
   })
 }

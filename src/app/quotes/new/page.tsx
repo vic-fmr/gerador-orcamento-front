@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation'
 import { useForm, Controller, Path } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { ArrowLeft, Save, Download, FileEdit, AlertCircle } from 'lucide-react'
+import { ArrowLeft, Save, Download, FileEdit, AlertCircle, Sparkles, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Quote, DEFAULT_PROPOSAL_DETAILS } from '@/store/useQuoteStore'
 import Link from 'next/link'
-import { useCreateQuote } from '@/hooks/useQuotes'
+import { useCreateQuote, useGenerateQuoteAI } from '@/hooks/useQuotes'
 import { ClientSelect } from '@/components/estimates/ClientSelect'
 import { useClientStore } from '@/store/useClientStore'
 import { generateQuotePDF } from '@/lib/pdf-export'
@@ -54,6 +55,11 @@ export function NewQuotePage() {
   const [step, setStep] = React.useState(1)
   const [saveError, setSaveError] = React.useState<string | null>(null)
   const createQuote = useCreateQuote()
+  
+  const [creationMode, setCreationMode] = React.useState<'manual' | 'ai'>('manual')
+  const [prompt, setPrompt] = React.useState('')
+  const [isAIGenerated, setIsAIGenerated] = React.useState(false)
+  const generateAI = useGenerateQuoteAI()
 
   const {
     register,
@@ -61,6 +67,7 @@ export function NewQuotePage() {
     control,
     trigger,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<QuoteFormValues>({
     resolver: zodResolver(quoteSchema),
@@ -109,9 +116,38 @@ export function NewQuotePage() {
   const nextStep = async (e?: React.MouseEvent) => {
     if (e) e.preventDefault()
     setSaveError(null)
-    const fieldsToValidate: Path<QuoteFormValues>[] = step === 1 ? ['title', 'client'] : ['items']
-    const result = await trigger(fieldsToValidate)
-    if (result) setStep(step + 1)
+    
+    if (step === 1) {
+      if (creationMode === 'ai') {
+        const isClientValid = await trigger('client')
+        if (!isClientValid) return
+        if (!prompt.trim()) {
+          setSaveError('Descreva o projeto para a IA gerar o orçamento.')
+          return
+        }
+
+        generateAI.mutate({ prompt, clientId }, {
+          onSuccess: (data) => {
+            setValue('title', data.title)
+            setValue('items', data.items)
+            if (data.proposalDetails) {
+              setValue('proposalDetails', data.proposalDetails)
+            }
+            setIsAIGenerated(true)
+            setStep(2)
+          },
+          onError: (error) => {
+            setSaveError(getErrorMessage(error, 'Erro ao gerar o orçamento por IA.'))
+          }
+        })
+      } else {
+        const result = await trigger(['title', 'client'])
+        if (result) setStep(2)
+      }
+    } else if (step === 2) {
+      const result = await trigger(['items'])
+      if (result) setStep(3)
+    }
   }
 
   const prevStep = (e: React.MouseEvent) => {
@@ -193,34 +229,71 @@ export function NewQuotePage() {
         }}
       >
         {step === 1 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-left-4 duration-300">
-            <div className="space-y-2">
-              <Label htmlFor="title">Título do Projeto</Label>
-              <Input
-                id="title"
-                placeholder="Ex: Reforma de Fachada Comercial"
-                {...register('title')}
-              />
-              {errors.title && (
-                <p className="text-sm font-medium text-destructive">{errors.title.message}</p>
-              )}
+          <div className="space-y-6 animate-in fade-in slide-in-from-left-4 duration-300">
+            
+            <div className="flex bg-muted/50 p-1 rounded-lg w-full max-w-sm mx-auto mb-6">
+              <button
+                type="button"
+                className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all ${creationMode === 'manual' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                onClick={() => setCreationMode('manual')}
+              >
+                Preenchimento Manual
+              </button>
+              <button
+                type="button"
+                className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${creationMode === 'ai' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                onClick={() => setCreationMode('ai')}
+              >
+                <Sparkles className="w-4 h-4" />
+                Gerar com IA
+              </button>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="client">Cliente</Label>
-              <Controller
-                control={control}
-                name="client"
-                render={({ field }) => (
-                  <ClientSelect
-                    id="client"
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="client">Cliente</Label>
+                <Controller
+                  control={control}
+                  name="client"
+                  render={({ field }) => (
+                    <ClientSelect
+                      id="client"
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
+                />
+                {errors.client && (
+                  <p className="text-sm font-medium text-destructive">{errors.client.message}</p>
                 )}
-              />
-              {errors.client && (
-                <p className="text-sm font-medium text-destructive">{errors.client.message}</p>
+              </div>
+
+              {creationMode === 'manual' ? (
+                <div className="space-y-2">
+                  <Label htmlFor="title">Título do Projeto</Label>
+                  <Input
+                    id="title"
+                    placeholder="Ex: Reforma de Fachada Comercial"
+                    {...register('title')}
+                  />
+                  {errors.title && (
+                    <p className="text-sm font-medium text-destructive">{errors.title.message}</p>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-2 animate-in fade-in zoom-in-95 duration-200">
+                  <Label htmlFor="prompt">Descrição do Projeto</Label>
+                  <Textarea
+                    id="prompt"
+                    placeholder="Ex: Reforma de fachada de delicatessen com 15m2, pintura nova..."
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    className="min-h-[120px] resize-y"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    A IA vai gerar o título, itens do orçamento e a proposta técnica.
+                  </p>
+                </div>
               )}
             </div>
           </div>
@@ -228,6 +301,17 @@ export function NewQuotePage() {
 
         {step === 2 && (
           <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+            {isAIGenerated && (
+              <div className="flex items-start gap-3 bg-primary/10 border border-primary/20 text-primary-foreground p-4 rounded-lg mb-4 text-sm text-primary">
+                <Sparkles className="w-5 h-5 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold mb-1">Rascunho gerado por IA</p>
+                  <p className="opacity-90 leading-relaxed">
+                    Verifique as quantidades, valores e detalhes propostos. Edite o que for necessário antes de avançar para a revisão.
+                  </p>
+                </div>
+              </div>
+            )}
             <Controller
               control={control}
               name="items"
@@ -333,8 +417,20 @@ export function NewQuotePage() {
 
           <div className="flex gap-4">
             {step < 3 ? (
-              <Button type="button" onClick={nextStep} className="bg-primary hover:bg-primary/90 flex-1 sm:flex-initial h-11 sm:h-9">
-                Próximo
+              <Button 
+                type="button" 
+                onClick={nextStep}
+                disabled={generateAI.isPending}
+                className="bg-primary hover:bg-primary/90 flex-1 sm:flex-initial h-11 sm:h-9"
+              >
+                {generateAI.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Gerando...
+                  </>
+                ) : (
+                  'Próximo'
+                )}
               </Button>
             ) : (
               <>

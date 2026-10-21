@@ -182,3 +182,13 @@ export async function updateQuote(id: number, data: Partial<Quote>): Promise<Quo
 export async function deleteQuote(id: number): Promise<void> {
   return apiDelete<void>(`/api/quotes/${id}`)
 }
+
+export interface AIGeneratedQuoteResponse {
+  title: string
+  items: LineItem[]
+  proposalDetails: import('@/store/useQuoteStore').QuoteTechnicalProposal
+}
+
+export async function generateQuoteFromAI(prompt: string, clientId?: number): Promise<AIGeneratedQuoteResponse> {
+  return apiPost<AIGeneratedQuoteResponse>('/api/quotes/generate-ai', { prompt, clientId })
+}
